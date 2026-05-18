@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>ご予約</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div id="progress-bar" class="progress-bar" style="display:none;">
+  <div class="step active" data-step="1">種別</div>
+  <div class="step" data-step="2">日付</div>
+  <div class="step" data-step="3">時間</div>
+  <div class="step" data-step="4">情報</div>
+  <div class="step" data-step="5">確認</div>
+</div>
+<button id="btn-back" class="btn-back" onclick="goBack()" style="display:none;">← 戻る</button>
+<div id="screen-type" class="screen active">
+  <div class="top-header">
+    <div class="shop-logo">🍛</div>
+    <h1 class="shop-name">ご予約</h1>
+    <p class="shop-sub">ご希望の種別をお選びください</p>
+  </div>
+  <div class="type-grid">
+    <button class="type-card food" onclick="selectType('food')">
+      <span class="card-emoji">🍛</span>
+      <span class="card-name">お食事</span>
+      <span class="card-desc">カレー・定食</span>
+    </button>
+    <button class="type-card fortune" onclick="selectType('fortune')">
+      <span class="card-emoji">🔮</span>
+      <span class="card-name">占い</span>
+      <span class="card-desc">30分 / お一人様</span>
+    </button>
+    <button class="type-card pcclass" onclick="selectType('pcclass')">
+      <span class="card-emoji">💻</span>
+      <span class="card-name">パソコン教室</span>
+      <span class="card-desc">90分 / 定員3名</span>
+    </button>
+  </div>
+</div>
+<div id="screen-calendar" class="screen">
+  <div class="section-header">
+    <div id="cal-type-badge" class="type-badge"></div>
+    <h2>日付をお選びください</h2>
+  </div>
+  <div class="month-nav">
+    <button class="month-btn" onclick="prevMonth()">&#8249;</button>
+    <h3 id="month-label"></h3>
+    <button class="month-btn" onclick="nextMonth()">&#8250;</button>
+  </div>
+  <div id="cal-grid" class="cal-grid"></div>
+  <div class="cal-legend">
+    <span class="legend-item"><span class="legend-dot available"></span>予約可</span>
+    <span class="legend-item"><span class="legend-dot closed"></span>定休日</span>
+  </div>
+</div>
+<div id="screen-time" class="screen">
+  <div class="section-header">
+    <div id="time-type-badge" class="type-badge"></div>
+    <h2 id="time-date-label"></h2>
+  </div>
+  <p class="time-guide">ご希望のお時間をお選びください</p>
+  <div id="time-slots" class="time-slots"></div>
+</div>
+<div id="screen-form" class="screen">
+  <div class="section-header">
+    <h2>お客様情報</h2>
+  </div>
+  <div class="booking-summary" id="form-summary"></div>
+  <div class="form-group">
+    <label>お名前 <span class="required">※必須</span></label>
+    <input type="text" id="f-name" placeholder="例：田中 太郎">
+  </div>
+  <div class="form-group">
+    <label>電話番号 <span class="required">※必須</span></label>
+    <input type="tel" id="f-phone" placeholder="例：090-0000-0000">
+  </div>
+  <div class="form-group" id="group-people">
+    <label>人数 <span class="required">※必須</span></label>
+    <select id="f-people">
+      <option value="">人数を選択</option>
+      <option value="1">1名</option>
+      <option value="2">2名</option>
+      <option value="3">3名</option>
+      <option value="4">4名</option>
+      <option value="5">5名</option>
+      <option value="6">6名</option>
+      <option value="7">7名</option>
+      <option value="8">8名</option>
+    </select>
+  </div>
+  <div class="form-group">
+    <label>ご要望・メモ <span class="optional">（任意）</span></label>
+    <textarea id="f-note" placeholder="アレルギーや特別なご要望があればご記入ください"></textarea>
+  </div>
+  <button class="btn-primary" onclick="showConfirm()">確認画面へ →</button>
+</div>
+<div id="screen-confirm" class="screen">
+  <div class="section-header">
+    <h2>予約内容のご確認</h2>
+  </div>
+  <div class="confirm-card" id="confirm-details"></div>
+  <p class="confirm-note">内容をご確認の上、予約を確定してください</p>
+  <button class="btn-primary" id="btn-submit" onclick="submitBooking()">予約を確定する</button>
+  <button class="btn-secondary" onclick="goBack()">修正する</button>
+</div>
+<div id="screen-done" class="screen">
+  <div class="done-wrap">
+    <div class="done-icon">✅</div>
+    <h2>予約が完了しました</h2>
+    <p class="done-sub">ご予約ありがとうございます</p>
+    <div class="done-card" id="done-details"></div>
+    <p class="done-note">当日のキャンセルはお電話にてご連絡ください</p>
+    <button class="btn-primary" onclick="resetApp()">最初に戻る</button>
+  </div>
+</div>
+<div id="loading" class="loading" style="display:none;">
+  <div class="spinner"></div>
+  <p>確認中...</p>
+</div>
+<div id="toast"></div>
+<script src="script.js"></script>
+</body>
+</html>
