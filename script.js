@@ -85,11 +85,9 @@ async function submitBooking() {
   const payload = { type: state.type, typeLabel: t.label, date: state.date, time: state.time, duration: t.duration, name: state.name, phone: state.phone, people: state.people, note: state.note, bookedAt: new Date().toISOString() };
   let ok = false;
   try {
-    await fetch(CONFIG.gasUrl, {
-      method: "POST",
-      mode: "no-cors",
-      body: JSON.stringify(payload)
-    });
+    const form = new FormData();
+    form.append("data", JSON.stringify(payload));
+    await fetch(CONFIG.gasUrl, { method: "POST", mode: "no-cors", body: form });
     ok = true;
   } catch { showToast("送信エラーが発生しました。お電話にてお問い合わせください。"); }
   showLoading(false); btn.disabled = false; btn.textContent = "予約を確定する";
