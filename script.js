@@ -1,11 +1,6 @@
 const CONFIG = {
   gasUrl: "https://script.google.com/macros/s/AKfycbzcmJdhFS1MSQ79nL36tUVTpcnjS87FVOuUHGKPPIX23g3VIR4HflOxQRZofpUe5mfp/exec",
-  openHour: 11,
-  closeHour: 18,
-  closedDays: [2],
-  closedSecondSunday: true,
-  maxDaysAhead: 60,
-  slotMinutes: 30,
+  openHour: 11, closeHour: 18, closedDays: [2], closedSecondSunday: true, maxDaysAhead: 60, slotMinutes: 30,
   types: {
     food: { label: "お食事", emoji: "🍛", colorClass: "food", capacity: 6, duration: 1, showPeople: true },
     fortune: { label: "占い", emoji: "🔮", colorClass: "fortune", capacity: 1, duration: 1, showPeople: false },
@@ -61,7 +56,7 @@ async function selectDate(ds) {
   showLoading(true); const booked = await fetchBookedSlots(ds, state.type); showLoading(false);
   renderTimeSlots(booked); showScreen("time");
 }
-async function fetchBookedSlots(date, type) { if (!CONFIG.gasUrl || CONFIG.gasUrl === "YOUR_GAS_URL_HERE") return []; try { const r = await fetch(CONFIG.gasUrl + "?date=" + date + "&type=" + type); const d = await r.json(); return d.bookedSlots || []; } catch { showToast("通信エラーが発生しました"); return []; } }
+async function fetchBookedSlots(date, type) { if (!CONFIG.gasUrl || CONFIG.gasUrl === "YOUR_GAS_URL_HERE") return []; try { const r = await fetch(CONFIG.gasUrl + "?date=" + date + "&type=" + type); const d = await r.json(); return d.bookedSlots || []; } catch { return []; } }
 function renderTimeSlots(booked) {
   const t = CONFIG.types[state.type], slots = generateSlots(), con = document.getElementById("time-slots");
   if (!slots.length) { con.innerHTML = '<div class="no-slots">受付時間外です</div>'; return; }
@@ -89,7 +84,14 @@ async function submitBooking() {
   const t = CONFIG.types[state.type];
   const payload = { type: state.type, typeLabel: t.label, date: state.date, time: state.time, duration: t.duration, name: state.name, phone: state.phone, people: state.people, note: state.note, bookedAt: new Date().toISOString() };
   let ok = false;
-  try { await fetch(CONFIG.gasUrl, { method:"POST", body:JSON.stringify(payload) }); ok = true; } catch { showToast("送信エラーが発生しました。お電話にてお問い合わせください。"); }
+  try {
+    await fetch(CONFIG.gasUrl, {
+      method: "POST",
+      mode: "no-cors",
+      body: JSON.stringify(payload)
+    });
+    ok = true;
+  } catch { showToast("送信エラーが発生しました。お電話にてお問い合わせください。"); }
   showLoading(false); btn.disabled = false; btn.textContent = "予約を確定する";
   if (ok) { const end = addMinutes(state.time, t.duration*CONFIG.slotMinutes); document.getElementById("done-details").innerHTML = row("種別",t.emoji+" "+t.label) + row("日付",formatDateJp(state.date)) + row("時間",state.time+" 〜 "+end) + (t.showPeople && state.people > 1 ? row("人数",state.people+"名") : "") + row("お名前",state.name) + row("お電話",state.phone); showScreen("done"); }
 }
