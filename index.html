@@ -2,116 +2,1111 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>ご予約 | Heart Break Cafe</title>
-  <link rel="stylesheet" href="style.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ご予約 | heart break 三</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700;900&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --green: #b5d400;
+      --green-dark: #8fa800;
+      --yellow: #f5e000;
+      --yellow-light: #fdf799;
+      --navy: #1b3a4b;
+      --navy-light: #254d63;
+      --black: #111111;
+      --white: #ffffff;
+      --gray-bg: #f4f4f0;
+      --gray-border: #ddd;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background: var(--gray-bg);
+      color: var(--black);
+    }
+
+    /* ===== HEADER ===== */
+    header {
+      background: var(--navy);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 64px;
+      border-bottom: 4px solid var(--green);
+    }
+    .logo {
+      font-size: 1.3rem;
+      font-weight: 900;
+      color: var(--white);
+      letter-spacing: 0.05em;
+    }
+    .logo span {
+      color: var(--green);
+      margin-left: 4px;
+    }
+    .logo-sub {
+      font-size: 0.7rem;
+      color: #aac;
+      font-weight: 400;
+      display: block;
+      letter-spacing: 0.1em;
+    }
+
+    /* ===== HERO ===== */
+    .hero {
+      background: var(--green);
+      padding: 32px 24px 28px;
+      border-bottom: 4px solid var(--black);
+    }
+    .hero-inner { max-width: 900px; margin: 0 auto; }
+    .hero h1 {
+      font-size: 2.4rem;
+      font-weight: 900;
+      line-height: 1.1;
+      letter-spacing: -0.02em;
+      color: var(--black);
+    }
+    .hero p {
+      margin-top: 10px;
+      font-size: 0.9rem;
+      color: #333;
+      line-height: 1.7;
+    }
+    .hero-tags {
+      display: flex;
+      gap: 8px;
+      margin-top: 14px;
+      flex-wrap: wrap;
+    }
+    .hero-tag {
+      background: var(--navy);
+      color: var(--white);
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 4px 12px;
+      letter-spacing: 0.08em;
+    }
+
+    /* ===== NAV ===== */
+    nav {
+      background: var(--navy);
+      display: flex;
+      overflow-x: auto;
+      border-bottom: 3px solid var(--green);
+    }
+    nav button {
+      background: none;
+      border: none;
+      padding: 14px 22px;
+      color: #99b;
+      font-size: 0.88rem;
+      font-weight: 700;
+      cursor: pointer;
+      white-space: nowrap;
+      border-bottom: 3px solid transparent;
+      margin-bottom: -3px;
+      letter-spacing: 0.05em;
+      transition: color 0.2s;
+      font-family: inherit;
+    }
+    nav button.active { color: var(--green); border-bottom-color: var(--green); }
+    nav button:hover { color: var(--yellow); }
+
+    /* ===== MAIN ===== */
+    main { max-width: 940px; margin: 28px auto; padding: 0 16px; }
+    .section { display: none; }
+    .section.active { display: block; }
+
+    /* ===== CATEGORY SELECTOR ===== */
+    .category-selector {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 0;
+      border: 3px solid var(--black);
+      margin-bottom: 24px;
+      overflow: hidden;
+    }
+    .cat-btn {
+      background: var(--white);
+      border: none;
+      border-right: 2px solid var(--black);
+      padding: 0;
+      cursor: pointer;
+      transition: background 0.2s;
+      font-family: inherit;
+    }
+    .cat-btn:last-child { border-right: none; }
+    .cat-btn.active { background: var(--green); }
+    .cat-btn:hover:not(.active) { background: var(--yellow-light); }
+    .cat-btn-inner {
+      padding: 16px 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 6px;
+    }
+    .cat-icon { font-size: 1.8rem; line-height: 1; }
+    .cat-label {
+      font-size: 0.85rem;
+      font-weight: 900;
+      letter-spacing: 0.05em;
+      color: var(--black);
+    }
+    .cat-sub {
+      font-size: 0.68rem;
+      color: #555;
+    }
+
+    /* ===== CARD ===== */
+    .card {
+      background: var(--white);
+      border: 2px solid var(--black);
+      padding: 28px;
+      margin-bottom: 24px;
+    }
+    .card-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      color: var(--navy);
+      text-transform: uppercase;
+      margin-bottom: 6px;
+    }
+    .card h2 {
+      font-size: 1.3rem;
+      font-weight: 900;
+      margin-bottom: 22px;
+      padding-bottom: 12px;
+      border-bottom: 2px solid var(--green);
+    }
+
+    /* ===== FORM ===== */
+    .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 18px; }
+    .form-group { display: flex; flex-direction: column; gap: 6px; }
+    .form-group.full { grid-column: 1 / -1; }
+    label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--navy);
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+    }
+    label .req {
+      color: var(--green-dark);
+      margin-left: 4px;
+    }
+    input, select, textarea {
+      border: 2px solid var(--black);
+      border-radius: 0;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+      font-family: inherit;
+      background: var(--white);
+      transition: border-color 0.2s, background 0.2s;
+    }
+    input:focus, select:focus, textarea:focus {
+      outline: none;
+      border-color: var(--green-dark);
+      background: #f8ffe0;
+    }
+    textarea { resize: vertical; min-height: 80px; }
+
+    .info-box {
+      background: var(--yellow-light);
+      border-left: 4px solid var(--yellow);
+      padding: 12px 16px;
+      font-size: 0.82rem;
+      color: #555;
+      margin-bottom: 18px;
+      line-height: 1.6;
+    }
+
+    /* ===== BUTTONS ===== */
+    .btn {
+      display: inline-block;
+      padding: 12px 28px;
+      border: 2px solid var(--black);
+      cursor: pointer;
+      font-family: inherit;
+      font-size: 0.92rem;
+      font-weight: 900;
+      letter-spacing: 0.08em;
+      transition: all 0.15s;
+    }
+    .btn-primary {
+      background: var(--green);
+      color: var(--black);
+    }
+    .btn-primary:hover { background: var(--yellow); }
+    .btn-secondary {
+      background: var(--white);
+      color: var(--black);
+    }
+    .btn-secondary:hover { background: var(--gray-bg); }
+    .btn-sm {
+      padding: 5px 12px;
+      font-size: 0.75rem;
+      border-width: 1.5px;
+    }
+    .btn-edit { background: var(--navy); color: var(--white); }
+    .btn-edit:hover { background: var(--navy-light); }
+    .btn-cancel { background: #fff0f0; color: #c00; }
+    .btn-cancel:hover { background: #ffe0e0; }
+    .form-actions { margin-top: 22px; display: flex; gap: 10px; flex-wrap: wrap; }
+
+    /* ===== TABLE ===== */
+    .filter-bar {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      align-items: center;
+    }
+    .filter-bar input,
+    .filter-bar select {
+      padding: 8px 10px;
+      font-size: 0.88rem;
+      border: 2px solid var(--black);
+      font-family: inherit;
+    }
+
+    table { width: 100%; border-collapse: collapse; }
+    th {
+      background: var(--navy);
+      color: var(--white);
+      padding: 11px 14px;
+      text-align: left;
+      font-size: 0.8rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+    }
+    td {
+      padding: 11px 14px;
+      border-bottom: 1px solid #e0e0d8;
+      font-size: 0.88rem;
+      vertical-align: middle;
+    }
+    tr:hover td { background: #f8ffe0; }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.05em;
+    }
+    .badge-confirmed { background: var(--green); color: var(--black); }
+    .badge-pending { background: var(--yellow); color: var(--black); }
+    .badge-cancelled { background: #fed7d7; color: #900; }
+
+    .cat-dot {
+      display: inline-block;
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 5px;
+    }
+    .cat-dot-food { background: #e67e22; }
+    .cat-dot-fortune { background: #9b59b6; }
+    .cat-dot-pc { background: #2980b9; }
+
+    .empty-state {
+      text-align: center;
+      padding: 48px;
+      color: #aaa;
+    }
+    .empty-state .e-icon { font-size: 3rem; margin-bottom: 12px; }
+    .empty-state p { font-size: 0.95rem; }
+
+    /* ===== CALENDAR ===== */
+    .calendar-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 16px;
+    }
+    .calendar-nav h3 {
+      font-size: 1.1rem;
+      font-weight: 900;
+    }
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 3px;
+    }
+    .cal-header {
+      text-align: center;
+      padding: 8px 4px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      background: var(--navy);
+      color: var(--white);
+      letter-spacing: 0.05em;
+    }
+    .cal-header:first-child { color: #ff9999; }
+    .cal-header:last-child { color: #99ccff; }
+    .cal-day {
+      background: var(--white);
+      min-height: 84px;
+      padding: 6px;
+      border: 1px solid #ddd;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .cal-day:hover { background: #f8ffe0; }
+    .cal-day.other-month { background: #f4f4f0; opacity: 0.5; }
+    .cal-day.today { border: 2px solid var(--green); }
+    .cal-day .day-num {
+      font-size: 0.82rem;
+      font-weight: 900;
+      margin-bottom: 4px;
+    }
+    .cal-day.today .day-num { color: var(--green-dark); }
+    .cal-event {
+      font-size: 0.67rem;
+      padding: 2px 5px;
+      margin-bottom: 2px;
+      overflow: hidden;
+      white-space: nowrap;
+      text-overflow: ellipsis;
+      font-weight: 700;
+    }
+    .cal-event-food { background: #fde8d0; color: #a04000; }
+    .cal-event-fortune { background: #ead5f5; color: #6a2f90; }
+    .cal-event-pc { background: #d0e8f8; color: #1a5580; }
+
+    /* ===== AVAILABILITY ===== */
+    .avail-cats {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+    }
+    .avail-cat-btn {
+      border: 2px solid var(--black);
+      padding: 8px 20px;
+      background: var(--white);
+      font-family: inherit;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .avail-cat-btn.active { background: var(--green); }
+    .avail-cat-btn:hover:not(.active) { background: var(--yellow-light); }
+
+    .availability-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+      gap: 8px;
+      margin-top: 16px;
+    }
+    .slot {
+      padding: 14px 8px;
+      text-align: center;
+      font-size: 0.88rem;
+      font-weight: 700;
+      border: 2px solid var(--black);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+    .slot small { display: block; font-size: 0.68rem; font-weight: 400; margin-top: 3px; }
+    .slot.available { background: var(--green); color: var(--black); }
+    .slot.available:hover { background: var(--yellow); transform: translateY(-2px); }
+    .slot.booked { background: #f0f0ec; color: #aaa; cursor: not-allowed; border-color: #ccc; }
+
+    /* ===== MODAL ===== */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 100;
+      align-items: center;
+      justify-content: center;
+    }
+    .modal-overlay.open { display: flex; }
+    .modal {
+      background: var(--white);
+      border: 3px solid var(--black);
+      padding: 28px;
+      width: 92%;
+      max-width: 480px;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+    .modal-title {
+      font-size: 0.7rem;
+      font-weight: 700;
+      letter-spacing: 0.15em;
+      color: var(--navy);
+      text-transform: uppercase;
+      margin-bottom: 4px;
+    }
+    .modal h3 {
+      font-size: 1.2rem;
+      font-weight: 900;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid var(--green);
+    }
+    .modal .form-grid { grid-template-columns: 1fr; }
+    .modal-actions { margin-top: 20px; display: flex; gap: 10px; justify-content: flex-end; }
+
+    /* ===== TOAST ===== */
+    .toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: var(--navy);
+      color: var(--white);
+      padding: 13px 22px;
+      font-size: 0.88rem;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+      border-left: 4px solid var(--green);
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.3s;
+      z-index: 200;
+      max-width: 320px;
+    }
+    .toast.show { opacity: 1; transform: translateY(0); }
+    .toast.error { border-left-color: #e53e3e; }
+
+    /* ===== FOOTER ===== */
+    footer {
+      margin-top: 48px;
+      background: var(--navy);
+      color: #99b;
+      text-align: center;
+      padding: 20px;
+      font-size: 0.78rem;
+      letter-spacing: 0.08em;
+      border-top: 3px solid var(--green);
+    }
+    footer span { color: var(--green); }
+
+    @media (max-width: 600px) {
+      .hero h1 { font-size: 1.7rem; }
+      .form-grid { grid-template-columns: 1fr; }
+      .category-selector { grid-template-columns: repeat(3, 1fr); }
+      table { font-size: 0.78rem; }
+      th, td { padding: 8px; }
+    }
+  </style>
 </head>
 <body>
-<div id="progress-bar" class="progress-bar" style="display:none;">
-  <div class="step active" data-step="1">種別</div>
-  <div class="step" data-step="2">日付</div>
-  <div class="step" data-step="3">時間</div>
-  <div class="step" data-step="4">情報</div>
-  <div class="step" data-step="5">確認</div>
-</div>
-<button id="btn-back" class="btn-back" onclick="goBack()" style="display:none;">← 戻る</button>
-<div id="screen-type" class="screen active">
-  <div class="top-header">
-    <div class="shop-logo">🐱</div>
-    <p class="shop-name">Heart Break Cafe</p>
-    <div class="divider"></div>
-    <h1 class="shop-title">ご予約</h1>
-    <p class="shop-sub">ご希望の種別をお選びください</p>
+
+<!-- HEADER -->
+<header>
+  <div>
+    <div class="logo">heart break <span>三</span></div>
+    <span class="logo-sub">RESERVATION SYSTEM</span>
   </div>
-  <div class="type-grid">
-    <button class="type-card food" onclick="selectType('food')">
-      <span class="card-emoji">🍛</span>
-      <div><span class="card-name">お食事</span><span class="card-desc">クニャンカレー・焼き芋・日替わり</span></div>
-      <span class="card-arrow">›</span>
-    </button>
-    <button class="type-card fortune" onclick="selectType('fortune')">
-      <span class="card-emoji">🔮</span>
-      <div><span class="card-name">占い</span><span class="card-desc">30分 / 完全予約制</span></div>
-      <span class="card-arrow">›</span>
-    </button>
-    <button class="type-card pcclass" onclick="selectType('pcclass')">
-      <span class="card-emoji">💻</span>
-      <div><span class="card-name">パソコン教室</span><span class="card-desc">90分 / 定員3名</span></div>
-      <span class="card-arrow">›</span>
-    </button>
+  <div style="color:#aac;font-size:0.78rem;text-align:right;">
+    11:00〜18:00<br>
+    <span style="font-size:0.7rem;">火曜・第2日曜定休</span>
+  </div>
+</header>
+
+<!-- HERO -->
+<div class="hero">
+  <div class="hero-inner">
+    <h1>ご予約</h1>
+    <p>heart break 三へのご予約はこちらから。<br>カフェ・占い・パソコン教室すべて完全予約制で承っております。</p>
+    <div class="hero-tags">
+      <span class="hero-tag">🍛 食事</span>
+      <span class="hero-tag">🔮 占い</span>
+      <span class="hero-tag">💻 PC教室</span>
+    </div>
   </div>
 </div>
-<div id="screen-calendar" class="screen">
-  <div class="section-header">
-    <div id="cal-type-badge" class="type-badge"></div>
-    <h2>日付をお選びください</h2>
+
+<!-- NAV -->
+<nav>
+  <button class="active" onclick="showSection('new', this)">＋ 新規予約</button>
+  <button onclick="showSection('list', this)">予約一覧</button>
+  <button onclick="showSection('calendar', this)">カレンダー</button>
+  <button onclick="showSection('availability', this)">空き確認</button>
+</nav>
+
+<main>
+
+  <!-- ===== 新規予約 ===== -->
+  <div id="section-new" class="section active">
+
+    <div class="card">
+      <div class="card-title">STEP 1</div>
+      <h2>予約の種類を選ぶ</h2>
+      <div class="category-selector">
+        <button class="cat-btn active" onclick="selectCategory('food', this)">
+          <div class="cat-btn-inner">
+            <span class="cat-icon">🍛</span>
+            <span class="cat-label">食事</span>
+            <span class="cat-sub">カフェご利用</span>
+          </div>
+        </button>
+        <button class="cat-btn" onclick="selectCategory('fortune', this)">
+          <div class="cat-btn-inner">
+            <span class="cat-icon">🔮</span>
+            <span class="cat-label">占い</span>
+            <span class="cat-sub">完全予約制</span>
+          </div>
+        </button>
+        <button class="cat-btn" onclick="selectCategory('pc', this)">
+          <div class="cat-btn-inner">
+            <span class="cat-icon">💻</span>
+            <span class="cat-label">PC教室</span>
+            <span class="cat-sub">完全予約制</span>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">STEP 2</div>
+      <h2>予約情報を入力する</h2>
+
+      <div class="info-box" id="categoryInfo">
+        🍛 <strong>食事のご予約</strong>：クミニャンカレー・焼き芋・日替わりご飯をお楽しみいただけます。
+      </div>
+
+      <form id="reservationForm">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>お名前<span class="req">*</span></label>
+            <input type="text" id="f-name" placeholder="山田 花子" required>
+          </div>
+          <div class="form-group">
+            <label>電話番号</label>
+            <input type="tel" id="f-phone" placeholder="090-0000-0000">
+          </div>
+          <div class="form-group">
+            <label>ご予約日<span class="req">*</span></label>
+            <input type="date" id="f-date" required>
+          </div>
+          <div class="form-group">
+            <label>ご希望の時間<span class="req">*</span></label>
+            <select id="f-time" required>
+              <option value="">選択してください</option>
+            </select>
+          </div>
+          <div class="form-group" id="f-count-group">
+            <label>人数</label>
+            <select id="f-count">
+              <option>1名</option><option>2名</option><option>3名</option>
+              <option>4名</option><option>5名以上</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>ステータス</label>
+            <select id="f-status">
+              <option value="confirmed">確定</option>
+              <option value="pending">仮予約</option>
+            </select>
+          </div>
+          <div class="form-group full">
+            <label>ご要望・メモ</label>
+            <textarea id="f-memo" placeholder="アレルギー、相談内容、学習レベルなど"></textarea>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">予約を登録する →</button>
+          <button type="button" class="btn btn-secondary" onclick="clearForm()">クリア</button>
+        </div>
+      </form>
+    </div>
   </div>
-  <div class="month-nav">
-    <button class="month-btn" onclick="prevMonth()">&#8249;</button>
-    <h3 id="month-label"></h3>
-    <button class="month-btn" onclick="nextMonth()">&#8250;</button>
+
+  <!-- ===== 予約一覧 ===== -->
+  <div id="section-list" class="section">
+    <div class="card">
+      <div class="card-title">RESERVATION LIST</div>
+      <h2>予約一覧</h2>
+      <div class="filter-bar">
+        <input type="text" id="searchInput" placeholder="名前で検索..." oninput="renderList()" style="min-width:140px;">
+        <select id="catFilter" onchange="renderList()">
+          <option value="">すべての種類</option>
+          <option value="food">🍛 食事</option>
+          <option value="fortune">🔮 占い</option>
+          <option value="pc">💻 PC教室</option>
+        </select>
+        <select id="statusFilter" onchange="renderList()">
+          <option value="">すべてのステータス</option>
+          <option value="confirmed">確定</option>
+          <option value="pending">仮予約</option>
+          <option value="cancelled">キャンセル</option>
+        </select>
+        <input type="date" id="dateFilter" onchange="renderList()">
+        <button class="btn btn-secondary btn-sm" onclick="clearFilters()">リセット</button>
+      </div>
+      <div style="overflow-x:auto;">
+        <table>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>種類</th>
+              <th>お名前</th>
+              <th>予約日</th>
+              <th>時間</th>
+              <th>人数</th>
+              <th>ステータス</th>
+              <th>操作</th>
+            </tr>
+          </thead>
+          <tbody id="reservationTable"></tbody>
+        </table>
+      </div>
+      <div id="emptyState" class="empty-state" style="display:none;">
+        <div class="e-icon">📋</div>
+        <p>予約が見つかりません</p>
+      </div>
+    </div>
   </div>
-  <div id="cal-grid" class="cal-grid"></div>
-  <div class="cal-legend">
-    <span class="legend-item"><span class="legend-dot available"></span>予約可</span>
-    <span class="legend-item"><span class="legend-dot closed"></span>定休日</span>
+
+  <!-- ===== カレンダー ===== -->
+  <div id="section-calendar" class="section">
+    <div class="card">
+      <div class="card-title">CALENDAR VIEW</div>
+      <h2 style="margin-bottom:16px;">カレンダー</h2>
+      <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;font-size:0.8rem;font-weight:700;">
+        <span><span style="display:inline-block;width:12px;height:12px;background:#fde8d0;border:1px solid #ccc;margin-right:5px;vertical-align:middle;"></span>食事</span>
+        <span><span style="display:inline-block;width:12px;height:12px;background:#ead5f5;border:1px solid #ccc;margin-right:5px;vertical-align:middle;"></span>占い</span>
+        <span><span style="display:inline-block;width:12px;height:12px;background:#d0e8f8;border:1px solid #ccc;margin-right:5px;vertical-align:middle;"></span>PC教室</span>
+      </div>
+      <div class="calendar-nav">
+        <button class="btn btn-secondary btn-sm" onclick="changeMonth(-1)">◀ 前月</button>
+        <strong id="calMonthLabel" style="font-size:1rem;"></strong>
+        <button class="btn btn-secondary btn-sm" onclick="changeMonth(1)">次月 ▶</button>
+      </div>
+      <div class="calendar-grid" id="calendarGrid"></div>
+    </div>
+  </div>
+
+  <!-- ===== 空き確認 ===== -->
+  <div id="section-availability" class="section">
+    <div class="card">
+      <div class="card-title">AVAILABILITY CHECK</div>
+      <h2>空き確認</h2>
+      <div style="display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;margin-bottom:6px;">
+        <div class="form-group">
+          <label>確認する日付</label>
+          <input type="date" id="avail-date" onchange="renderAvailability()" style="width:200px;">
+        </div>
+      </div>
+      <div class="avail-cats">
+        <button class="avail-cat-btn active" onclick="selectAvailCat('food', this)">🍛 食事</button>
+        <button class="avail-cat-btn" onclick="selectAvailCat('fortune', this)">🔮 占い</button>
+        <button class="avail-cat-btn" onclick="selectAvailCat('pc', this)">💻 PC教室</button>
+      </div>
+      <div style="font-size:0.8rem;color:#666;margin-bottom:4px;">
+        🟢 空き ／ ⬜ 予約済 &nbsp;｜ 空きをクリックすると予約フォームへ
+      </div>
+      <div class="availability-grid" id="availabilityGrid"></div>
+    </div>
+  </div>
+
+</main>
+
+<!-- 編集モーダル -->
+<div class="modal-overlay" id="editModal">
+  <div class="modal">
+    <div class="modal-title">EDIT RESERVATION</div>
+    <h3>予約を編集</h3>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>種類</label>
+        <select id="e-cat">
+          <option value="food">🍛 食事</option>
+          <option value="fortune">🔮 占い</option>
+          <option value="pc">💻 PC教室</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>お名前<span class="req">*</span></label>
+        <input type="text" id="e-name">
+      </div>
+      <div class="form-group">
+        <label>電話番号</label>
+        <input type="tel" id="e-phone">
+      </div>
+      <div class="form-group">
+        <label>予約日<span class="req">*</span></label>
+        <input type="date" id="e-date">
+      </div>
+      <div class="form-group">
+        <label>時間帯</label>
+        <select id="e-time"></select>
+      </div>
+      <div class="form-group">
+        <label>人数</label>
+        <select id="e-count">
+          <option>1名</option><option>2名</option><option>3名</option>
+          <option>4名</option><option>5名以上</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>ステータス</label>
+        <select id="e-status">
+          <option value="confirmed">確定</option>
+          <option value="pending">仮予約</option>
+          <option value="cancelled">キャンセル</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>メモ</label>
+        <textarea id="e-memo"></textarea>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-secondary" onclick="closeModal()">閉じる</button>
+      <button class="btn btn-primary" onclick="saveEdit()">保存する →</button>
+    </div>
   </div>
 </div>
-<div id="screen-time" class="screen">
-  <div class="section-header">
-    <div id="time-type-badge" class="type-badge"></div>
-    <h2 id="time-date-label"></h2>
-  </div>
-  <p class="time-guide">ご希望のお時間をお選びください</p>
-  <div id="time-slots" class="time-slots"></div>
-</div>
-<div id="screen-form" class="screen">
-  <div class="section-header"><h2>お客様情報のご入力</h2></div>
-  <div class="booking-summary" id="form-summary"></div>
-  <div class="form-group">
-    <label>お名前 <span class="required">※必須</span></label>
-    <input type="text" id="f-name" placeholder="例：田中 太郎">
-  </div>
-  <div class="form-group">
-    <label>お電話番号 <span class="required">※必須</span></label>
-    <input type="tel" id="f-phone" placeholder="例：090-0000-0000">
-  </div>
-  <div class="form-group" id="group-people">
-    <label>人数 <span class="required">※必須</span></label>
-    <select id="f-people">
-      <option value="">人数をお選びください</option>
-      <option value="1">1名</option><option value="2">2名</option>
-      <option value="3">3名</option><option value="4">4名</option>
-      <option value="5">5名</option><option value="6">6名</option>
-    </select>
-  </div>
-  <div class="form-group">
-    <label>ご要望・アレルギー等 <span class="optional">（任意）</span></label>
-    <textarea id="f-note" placeholder="アレルギーや特別なご要望があればご記入ください"></textarea>
-  </div>
-  <button class="btn-primary" onclick="showConfirm()">確認画面へ</button>
-</div>
-<div id="screen-confirm" class="screen">
-  <div class="section-header"><h2>予約内容のご確認</h2></div>
-  <div class="confirm-card" id="confirm-details"></div>
-  <p class="confirm-note">内容をご確認の上、ご予約を確定してください</p>
-  <button class="btn-primary" id="btn-submit" onclick="submitBooking()">予約を確定する</button>
-  <button class="btn-secondary" onclick="goBack()">修正する</button>
-</div>
-<div id="screen-done" class="screen">
-  <div class="done-wrap">
-    <div class="done-icon">🐱</div>
-    <h2>ご予約が完了しました</h2>
-    <p class="done-sub">ありがとうございます。当日お待ちしております。</p>
-    <div class="done-card" id="done-details"></div>
-    <p class="done-note">キャンセル・変更は前日までにお電話にてご連絡ください。</p>
-    <button class="btn-primary" onclick="resetApp()">最初に戻る</button>
-  </div>
-</div>
-<div id="loading" class="loading" style="display:none;">
-  <div class="spinner"></div><p>送信中...</p>
-</div>
-<div id="toast"></div>
-<script src="script.js"></script>
+
+<div class="toast" id="toast"></div>
+
+<footer>
+  © heart break <span>三</span> &nbsp;｜&nbsp; 福島県郡山市 &nbsp;｜&nbsp; 11:00〜18:00
+</footer>
+
+<script>
+// ===== 設定 =====
+const SLOTS = {
+  food:    ['11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30'],
+  fortune: ['11:00','12:00','13:00','14:00','15:00','16:00','17:00'],
+  pc:      ['11:00','13:00','15:00','17:00'],
+};
+
+const CAT_INFO = {
+  food:    '🍛 <strong>食事のご予約</strong>：クミニャンカレー・焼き芋・日替わりご飯をお楽しみいただけます。',
+  fortune: '🔮 <strong>占いのご予約</strong>：完全予約制です。ご相談内容をメモ欄にお書きいただけるとスムーズです。',
+  pc:      '💻 <strong>パソコン教室のご予約</strong>：完全予約制です。現在のスキルレベルをメモ欄にご記入ください。',
+};
+
+const CAT_LABEL = { food: '🍛 食事', fortune: '🔮 占い', pc: '💻 PC教室' };
+const CAT_EVENT_CLASS = { food: 'cal-event-food', fortune: 'cal-event-fortune', pc: 'cal-event-pc' };
+
+// ===== データ =====
+let reservations = JSON.parse(localStorage.getItem('hb3_reservations') || '[]');
+let editingId = null;
+let calYear, calMonth;
+let currentCat = 'food';
+let availCat = 'food';
+
+const today = new Date();
+calYear = today.getFullYear();
+calMonth = today.getMonth();
+
+// 初期値
+document.getElementById('f-date').value = today.toISOString().split('T')[0];
+document.getElementById('avail-date').value = today.toISOString().split('T')[0];
+updateSlots('f-time', 'food');
+
+// サンプルデータ
+if (reservations.length === 0) {
+  const d = today.toISOString().split('T')[0];
+  reservations = [
+    { id:1, cat:'food',    name:'田中 花子', phone:'090-1234-5678', date:d, time:'12:00', count:'2名', status:'confirmed', memo:'' },
+    { id:2, cat:'fortune', name:'佐藤 美月', phone:'080-9876-5432', date:d, time:'14:00', count:'1名', status:'confirmed', memo:'恋愛相談' },
+    { id:3, cat:'pc',      name:'鈴木 次郎', phone:'',              date:d, time:'11:00', count:'1名', status:'pending',   memo:'初心者です' },
+  ];
+  save();
+}
+
+function save() {
+  localStorage.setItem('hb3_reservations', JSON.stringify(reservations));
+}
+
+function nextId() {
+  return reservations.length > 0 ? Math.max(...reservations.map(r => r.id)) + 1 : 1;
+}
+
+// ===== ナビ =====
+function showSection(name, btn) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.getElementById('section-' + name).classList.add('active');
+  if (btn) btn.classList.add('active');
+  if (name === 'list') renderList();
+  if (name === 'calendar') renderCalendar();
+  if (name === 'availability') renderAvailability();
+}
+
+// ===== カテゴリ選択 =====
+function selectCategory(cat, btn) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.getElementById('categoryInfo').innerHTML = CAT_INFO[cat];
+  updateSlots('f-time', cat);
+  // 食事以外は人数を隠す
+  const cg = document.getElementById('f-count-group');
+  cg.style.display = (cat === 'food') ? 'flex' : 'none';
+}
+
+function updateSlots(selectId, cat) {
+  const sel = document.getElementById(selectId);
+  const current = sel.value;
+  sel.innerHTML = '<option value="">選択してください</option>' +
+    SLOTS[cat].map(s => `<option value="${s}" ${s===current?'selected':''}>${s}</option>`).join('');
+}
+
+// ===== 新規登録 =====
+document.getElementById('reservationForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const r = {
+    id: nextId(),
+    cat: currentCat,
+    name: document.getElementById('f-name').value.trim(),
+    phone: document.getElementById('f-phone').value.trim(),
+    date: document.getElementById('f-date').value,
+    time: document.getElementById('f-time').value,
+    count: currentCat === 'food' ? document.getElementById('f-count').value : '1名',
+    status: document.getElementById('f-status').value,
+    memo: document.getElementById('f-memo').value.trim(),
+  };
+  if (!r.name || !r.date || !r.time) { showToast('必須項目を入力してください', 'error'); return; }
+  reservations.push(r);
+  save();
+  showToast(`${CAT_LABEL[r.cat]} の予約を登録しました！`);
+  clearForm();
+});
+
+function clearForm() {
+  document.getElementById('f-name').value = '';
+  document.getElementById('f-phone').value = '';
+  document.getElementById('f-date').value = today.toISOString().split('T')[0];
+  document.getElementById('f-time').value = '';
+  document.getElementById('f-count').value = '1名';
+  document.getElementById('f-status').value = 'confirmed';
+  document.getElementById('f-memo').value = '';
+}
+
+// ===== 一覧 =====
+const BADGE_LABEL = { confirmed:'確定', pending:'仮予約', cancelled:'キャンセル' };
+const BADGE_CLS   = { confirmed:'badge-confirmed', pending:'badge-pending', cancelled:'badge-cancelled' };
+
+function renderList() {
+  const search  = document.getElementById('searchInput').value.toLowerCase();
+  const catF    = document.getElementById('catFilter').value;
+  const statusF = document.getElementById('statusFilter').value;
+  const dateF   = document.getElementById('dateFilter').value;
+
+  let filtered = reservations.filter(r => {
+    if (search  && !r.name.toLowerCase().includes(search)) return false;
+    if (catF    && r.cat    !== catF)    return false;
+    if (statusF && r.status !== statusF) return false;
+    if (dateF   && r.date   !== dateF)   return false;
+    return true;
+  }).sort((a,b) => (a.date+a.time).localeCompare(b.date+b.time));
+
+  const tbody = document.getElementById('reservationTable');
+  const empty = document.getElementById('emptyState');
+
+  if (filtered.length === 0) {
+    tbody.innerHTML = '';
+    empty.style.display = 'block';
+    return;
+  }
+  empty.style.display = 'none';
+
+  tbody.innerHTML = filtered.map(r => `
+    <tr>
+      <td style="color:#aaa;font-size:0.78rem;">#${r.id}</td>
+      <td>${CAT_LABEL[r.cat] || r.cat}</td>
+      <td><strong>${r.name}</strong>${r.phone ? `<br><span style="color:#999;font-size:0.75rem;">${r.phone}</span>` : ''}</td>
+      <td>${r.date.replace(/-/g,'/')}</td>
+      <td><strong>${r.time}</strong></td>
+      <td>${r.count}</td>
+      <td><span class="badge ${BADGE_CLS[r.status]}">${BADGE_LABEL[r.status]}</span></td>
+      <td style="display:flex;gap:6px;flex-wrap:wrap;">
+        <button class="btn btn-edit btn-sm" onclick="openEdit(${r.id})">編集</button>
+        <button class="btn btn-cancel btn-sm" onclick="cancelReservation(${r.id})">
+          ${r.status === 'cancelled' ? '削除' : 'キャンセル'}
+        </button>
+      </td>
+    </tr>
+  `).join('');
+}
+
+function clearFilters() {
+  document.getElementById('searchInput').value = '';
+  document.getElementById('catFilter').value = '';
+  document.getElementById('statusFilter').value = '';
+  document.getElementById('dateFilter').value = '';
+  renderList();
+}
+
+function cancelReservation(id) {
+  const r = reservations.find(r => r.id === id);
+  if (!r) return;
+  if (r.status === 'cancelled') {
+    if (!confirm(`予約 #${id}（${r.name}）を完全に削除しますか？`)) return;
+    reservations = reservations.filter(r => r.id !== id);
+    showToast('予約を削除しました', 'error');
+  } else {
+    if (!confirm(`予約 #${id}（${r.name}）をキャンセルしますか？`)) return;
+    r.status = 'cancelled';
+    showToast('予約をキャンセルしました', 'error');
+  }
+  save();
+  renderList();
+}
+
+// ===== 編集モーダル =====
+function openEdit(id) {
+  const r = reservations.find(r => r.id === id);
+  if (!r) return;
+  editingId = id;
+  document.getElementById('e-cat').value   = r.cat;
+  document.getElementById('e-name').value  = r.name;
+  document.getElementById('e-phone').value = r.phone;
+  document.getElementById('e-date').value  = r.date;
+  updateSlots('e-time', r.cat);
+  document.getElementById('e-time').value   = r.time;
+  document.getElementById('e-count').value  = r.count;
+  document.getElementById('e-status').value = r.status;
+  document.getElementById('e-memo').value   = r.memo;
+  document.getElementById('editModal').classList.add('open');
+}
+document.getElementById('e-cat').addEventListener('change', function() {
+  updateSlots('e-time', this.value);
+});
+function closeModal() {
+  document.getElementById('editModal').classList.remove('open');
+  editingId = null;
+}
+function saveEdit() {
+  const r = reservations.find(r => r.id === editingId);
+  if (!r) return;
+  r.cat    = document.getElementById('e-cat').value;
+  r.name   = document.getElementById('e-name').value.trim();
+  r.phone  = document.getElementById('e-phone').value.trim();
+  r.date   = document.getElementById('e-date').value;
+  r.time   = document.getElementById('e-time').value;
+  r.count  = document.getElementById('e-count').value;
+  r.status = document.getElementById('e-status').value;
+  r.memo   = document.getElementById('e-memo').value.trim();
+  save();
+  closeModal();
+  renderList();
+  showToast('予約を更新しました');
+}
+document.getElementById('editModal').addEventListener('click', function(e) {
+  if (e.target === this) closeModal();
+});
+
+// ===== カレンダー =====
+function renderCalendar() {
+  document.getElementById('calMonthLabel').textContent = `${calYear}年 ${calMonth+1}月`;
+  const grid = document.getElementById('calendarGrid');
+  const headers = ['日','月','火','水','木','金','土'];
+  grid.innerHTML = headers.map(d => `<div class="cal-header">${d}</div>`).join('');
+
+  const first = new Date(calYear, calMonth, 1);
+  const last  = new Date(calYear, calMonth+1, 0);
+  const startDay = first.getDay();
+  const todayStr = today.toISOString().split('T')[0];
+
+  for (let i = 0; i < startDay; i++) {
+    const d = new Date(calYear, calMonth, -startDay+i+1);
+    grid.innerHTML += `<div class="cal-day other-month"><div class="day-num">${d.getDate()}</div></div>`;
+  }
+
+  for (let d = 1; d <= last.getDate(); d++) {
+    const ds = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+    const dayRes = reservations.filter(r => r.date === ds && r.status !== 'cancelled');
+    const isToday = ds === todayStr;
+
+    const events = dayRes.slice(0,3).map(r =>
+      `<div class="cal-event ${CAT_EVENT_CLASS[r.cat]}">${r.time} ${r.name}</div>`
+    ).join('');
+    const more = dayRes.length > 3 ? `<div style="font-size:0.67rem;color:#aaa;">+${dayRes.length-3}件</div>` : '';
+
+    grid.innerHTML += `
+      <div class="cal-day ${isToday?'today':''}" onclick="filterByDate('${ds}')">
+        <div class="day-num">${d}</div>
+        ${events}${more}
+      </div>`;
+  }
+
+  const remaining = (7 - (startDay + last.getDate()) % 7) % 7;
+  for (let i = 1; i <= remaining; i++) {
+    grid.innerHTML += `<div class="cal-day other-month"><div class="day-num">${i}</div></div>`;
+  }
+}
+
+function changeMonth(delta) {
+  calMonth += delta;
+  if (calMonth > 11) { calMonth=0; calYear++; }
+  if (calMonth < 0)  { calMonth=11; calYear--; }
+  renderCalendar();
+}
+
+function filterByDate(ds) {
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('nav button')[1].classList.add('active');
+  showSection('list');
+  document.getElementById('dateFilter').value = ds;
+  renderList();
+}
+
+// ===== 空き確認 =====
+function selectAvailCat(cat, btn) {
+  availCat = cat;
+  document.querySelectorAll('.avail-cat-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderAvailability();
+}
+
+function renderAvailability() {
+  const date = document.getElementById('avail-date').value;
+  const booked = reservations
+    .filter(r => r.date === date && r.cat === availCat && r.status !== 'cancelled')
+    .map(r => r.time);
+
+  const grid = document.getElementById('availabilityGrid');
+  const slots = SLOTS[availCat];
+  grid.innerHTML = slots.map(slot => {
+    const isBooked = booked.includes(slot);
+    return `<div class="slot ${isBooked ? 'booked' : 'available'}"
+      ${!isBooked ? `onclick="quickBook('${slot}','${date}','${availCat}')"` : ''}>
+      ${slot}
+      <small>${isBooked ? '予約済' : '空き'}</small>
+    </div>`;
+  }).join('');
+}
+
+function quickBook(time, date, cat) {
+  currentCat = cat;
+  document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('.cat-btn')[['food','fortune','pc'].indexOf(cat)].classList.add('active');
+  document.getElementById('categoryInfo').innerHTML = CAT_INFO[cat];
+  updateSlots('f-time', cat);
+  document.getElementById('f-date').value = date;
+  document.getElementById('f-time').value = time;
+  document.getElementById('f-count-group').style.display = cat === 'food' ? 'flex' : 'none';
+
+  document.querySelectorAll('nav button').forEach(b => b.classList.remove('active'));
+  document.querySelectorAll('nav button')[0].classList.add('active');
+  showSection('new');
+  showToast(`${CAT_LABEL[cat]} ${time} の予約フォームを開きました`);
+}
+
+// ===== Toast =====
+function showToast(msg, type='') {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast ' + type;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 3000);
+}
+</script>
 </body>
 </html>
