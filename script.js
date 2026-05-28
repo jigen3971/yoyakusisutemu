@@ -82,12 +82,20 @@ function addMinutes(time, min) { const [h,m] = time.split(":").map(Number), t = 
 async function submitBooking() {
   const btn = document.getElementById("btn-submit"); btn.disabled = true; btn.textContent = "送信中..."; showLoading(true);
   const t = CONFIG.types[state.type];
-  const payload = { type: state.type, typeLabel: t.label, date: state.date, time: state.time, duration: t.duration, name: state.name, phone: state.phone, people: state.people, note: state.note, bookedAt: new Date().toISOString() };
+  const params = new URLSearchParams({
+    action: "book",
+    date: state.date,
+    typeLabel: t.label,
+    time: state.time,
+    duration: t.duration,
+    name: state.name,
+    phone: state.phone,
+    people: state.people,
+    note: state.note
+  });
   let ok = false;
   try {
-    const form = new FormData();
-    form.append("data", JSON.stringify(payload));
-    await fetch(CONFIG.gasUrl, { method: "POST", mode: "no-cors", body: form });
+    await fetch(CONFIG.gasUrl + "?" + params.toString(), { mode: "no-cors" });
     ok = true;
   } catch { showToast("送信エラーが発生しました。お電話にてお問い合わせください。"); }
   showLoading(false); btn.disabled = false; btn.textContent = "予約を確定する";
