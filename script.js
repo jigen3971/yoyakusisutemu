@@ -1,5 +1,5 @@
 const CONFIG = {
-  gasUrl: "https://script.google.com/macros/s/AKfycbxJba3FS89xSH_GPCN2fcU4reSYrD6slHI7zEKsUt-qMHvO4osE3--mGyfu89q5oCso/exec",
+  gasUrl: "./proxy.ph
   openHour: 11, closeHour: 18, closedDays: [2], closedSecondSunday: true, maxDaysAhead: 60, slotMinutes: 30,
   types: {
     food: { label: "お食事", emoji: "🍛", colorClass: "food", capacity: 6, duration: 1, showPeople: true },
