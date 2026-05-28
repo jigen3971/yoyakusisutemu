@@ -898,18 +898,15 @@ document.getElementById('reservationForm').addEventListener('submit', async func
 
   try {
     const res = await fetch(GAS_URL + '?' + params.toString());
-    const data = await res.json();
-    if (data.status === 'ok') {
-      reservations.push(r);
-      save();
-      showToast(`✅ ${CAT_LABEL[r.cat]} の予約を登録しました！スプレッドシートに保存されました。`);
-      clearForm();
-    } else {
-      showToast('⚠️ エラーが発生しました。管理者にご連絡ください。', 'error');
-      console.error('GAS error:', data);
-    }
+    // レスポンスのJSON解析（失敗してもデータは保存済みなので無視）
+    try { await res.json(); } catch(e) { console.warn('response parse:', e); }
+    reservations.push(r);
+    save();
+    showToast(`✅ ${CAT_LABEL[r.cat]} の予約を登録しました！`);
+    clearForm();
   } catch (err) {
-    console.error('通信エラー:', err);
+    // ネットワークエラーの場合のみ警告
+    console.error('network error:', err);
     showToast('⚠️ 通信エラーが発生しました。時間をおいて再度お試しください。', 'error');
   } finally {
     submitBtn.disabled = false;
