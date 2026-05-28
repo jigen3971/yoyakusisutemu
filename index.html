@@ -776,6 +776,9 @@
 </footer>
 
 <script>
+// ===== GAS 設定 =====
+const GAS_URL = 'https://script.google.com/macros/s/AKfycbzcmJdhFS1MSQ79nL36tUVTpcnjS87FVOuUHGKPPIX23g3VIR4HflOxQRZofpUe5mfp/exec';
+
 // ===== 設定 =====
 const SLOTS = {
   food:    ['11:00','11:30','12:00','12:30','13:00','13:30','14:00','14:30','15:00','15:30','16:00','16:30','17:00','17:30'],
@@ -858,7 +861,7 @@ function updateSlots(selectId, cat) {
 }
 
 // ===== 新規登録 =====
-document.getElementById('reservationForm').addEventListener('submit', function(e) {
+document.getElementById('reservationForm').addEventListener('submit', async function(e) {
   e.preventDefault();
   const r = {
     id: nextId(),
@@ -872,10 +875,50 @@ document.getElementById('reservationForm').addEventListener('submit', function(e
     memo: document.getElementById('f-memo').value.trim(),
   };
   if (!r.name || !r.date || !r.time) { showToast('必須項目を入力してください', 'error'); return; }
-  reservations.push(r);
-  save();
-  showToast(`${CAT_LABEL[r.cat]} の予約を登録しました！`);
-  clearForm();
+
+  // ボタンを送信中に変更
+  const submitBtn = document.querySelector('#reservationForm button[type="submit"]');
+  submitBtn.disabled = true;
+  submitBtn.textContent = '送信中...';
+
+  // GAS に送信
+  const durationMap = { food: 30, fortune: 60, pc: 120 };
+  const peopleNum = r.count.replace('名以上','').replace('名','');
+  const params = new URLSearchParams({
+    action:    'book',
+    name:      r.name,
+    phone:     r.phone,
+    date:      r.date,
+    time:      r.time,
+    typeLabel: CAT_LABEL[r.cat],
+    people:    peopleNum,
+    note:      r.memo,
+    duration:  durationMap[r.cat] || 30,
+  });
+
+  try {
+    const res = await fetch(GAS_URL + '?' + params.toString());
+    const data = await res.json();
+    if (data.status === 'ok') {
+      reservations.push(r);
+      save();
+      showToast(`✅ ${CAT_LABEL[r.cat]} の予約を登録しました！スプレッドシートに保存されました。`);
+      clearForm();
+    } else {
+      showToast('⚠️ GASエラーが発生しました。管理者にお問い合わせください。', 'error');
+      console.error('GAS error:', data);
+    }
+  } catch (err) {
+    // ネット接続エラーの場合はローカル保存のみ
+    console.warn('GAS通信エラー（ローカル保存のみ）:', err);
+    reservations.push(r);
+    save();
+    showToast(`⚠️ 予約を登録しました（GAS未送信・要確認）`, 'error');
+    clearForm();
+  } finally {
+    submitBtn.disabled = false;
+    submitBtn.textContent = '予約を登録する →';
+  }
 });
 
 function clearForm() {
