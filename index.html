@@ -777,7 +777,7 @@
 
 <script>
 // ===== GAS 設定 =====
-const GAS_URL = 'https://script.google.com/macros/s/AKfycbzcmJdhFS1MSQ79nL36tUVTpcnjS87FVOuUHGKPPIX23g3VIR4HflOxQRZofpUe5mfp/exec';
+const GAS_URL = './proxy.php';
 
 // ===== 設定 =====
 const SLOTS = {
@@ -897,21 +897,20 @@ document.getElementById('reservationForm').addEventListener('submit', async func
   });
 
   try {
-    // no-cors: GASへのCORS制限を回避（レスポンスは読めないが送信できる）
-    await fetch(GAS_URL + '?' + params.toString(), { mode: 'no-cors' });
-    reservations.push(r);
-    save();
-    showToast(`✅ ${CAT_LABEL[r.cat]} の予約を登録しました！`);
-    clearForm();
+    const res = await fetch(GAS_URL + '?' + params.toString());
+    const data = await res.json();
+    if (data.status === 'ok') {
+      reservations.push(r);
+      save();
+      showToast(`✅ ${CAT_LABEL[r.cat]} の予約を登録しました！スプレッドシートに保存されました。`);
+      clearForm();
+    } else {
+      showToast('⚠️ エラーが発生しました。管理者にご連絡ください。', 'error');
+      console.error('GAS error:', data);
+    }
   } catch (err) {
-    // フォールバック：img タグで送信（CORS完全回避）
-    console.warn('fetch失敗、img送信に切替:', err);
-    const beacon = new Image();
-    beacon.src = GAS_URL + '?' + params.toString();
-    reservations.push(r);
-    save();
-    showToast(`✅ ${CAT_LABEL[r.cat]} の予約を登録しました！`);
-    clearForm();
+    console.error('通信エラー:', err);
+    showToast('⚠️ 通信エラーが発生しました。時間をおいて再度お試しください。', 'error');
   } finally {
     submitBtn.disabled = false;
     submitBtn.textContent = '予約を登録する →';
