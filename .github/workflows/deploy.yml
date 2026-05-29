@@ -21,6 +21,7 @@ jobs:
           password: ${{ secrets.FTP_PASSWORD }}
           server-dir: /jigen3971.xyz/public_html/reservation/
           local-dir: ./
+          state-name: ".ftp-deploy-sync-state-2.json"
           exclude: |
             **/.git*
             **/.git*/**
