@@ -898,17 +898,17 @@ document.getElementById('reservationForm').addEventListener('submit', async func
 
   try {
     const res = await fetch(GAS_URL + '?' + params.toString());
-    // レスポンスのJSON解析（失敗してもデータは保存済みなので無視）
+    // レスポンスのJSON解析
     let resData = {};
-  try { resData = await res.json(); } catch(e) { console.warn('response parse:', e); }
-  if (resData.lineUrl) {
+    try { resData = await res.json(); } catch(e) { console.warn('response parse:', e); }
+    // LINE友だち追加ボタンを表示（lineUrlが取れなくても固定URLで表示）
+    const lineUrl = resData.lineUrl || 'https://lin.ee/OiWZie7';
     setTimeout(() => {
       const d = document.createElement('div');
       d.style.cssText = 'position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#fff;border:2px solid #06C755;border-radius:12px;padding:16px 20px;text-align:center;z-index:9999;box-shadow:0 4px 20px rgba(0,0,0,0.2);width:90%;max-width:320px;';
-      d.innerHTML = '<p style="margin:0 0 10px;font-size:14px;">公式LINEの友だち追加をお願いします！</p><a href="' + resData.lineUrl + '" target="_blank" style="display:inline-block;background:#06C755;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:bold;">📲 LINE友だち追加はこちら</a><br><button onclick="this.parentElement.remove()" style="margin-top:10px;background:none;border:none;color:#999;cursor:pointer;">×閉じる</button>';
+      d.innerHTML = '<p style="margin:0 0 10px;font-size:14px;">公式LINEの友だち追加をお願いします！</p><a href="' + lineUrl + '" target="_blank" style="display:inline-block;background:#06C755;color:#fff;padding:10px 20px;border-radius:8px;text-decoration:none;font-weight:bold;">📲 LINE友だち追加はこちら</a><br><button onclick="this.parentElement.remove()" style="margin-top:10px;background:none;border:none;color:#999;cursor:pointer;">×閉じる</button>';
       document.body.appendChild(d);
     }, 800);
-  }
     reservations.push(r);
     save();
     showToast(`✅ ${CAT_LABEL[r.cat]} の予約を登録しました！`);
