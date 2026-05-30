@@ -156,7 +156,7 @@
     <div class="name-sub">Pakisulat ang iyong pangalan.<br>スコアを記録するために使います。</div>
     <input type="text" class="name-input" id="learner-name-input" placeholder="例）Maria / 山田 太郎" maxlength="30">
     <span class="name-input-label">※ ニックネームでも OK です</span>
-    <button class="btn-name-start" onclick="confirmName()">スタート！ 🚀</button>
+    <button class="btn-name-start" onclick="confirmName()">つぎへ →</button>
     <button class="btn-name-skip" onclick="confirmName(true)">スキップして はじめる</button>
   </div>
 </div>
@@ -639,7 +639,13 @@ function retryLesson(){startLesson(currentLessonId);}
 function goHome(){showScreen('home');renderHome();}
 function showScreen(name){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(name+'-screen').classList.add('active');window.scrollTo(0,0);}
 
-renderHome();
+// アプリ起動時：名前未登録なら名前入力画面を最初に表示
+if(!learnerName){
+  showScreen('name');
+  document.getElementById('learner-name-input').focus();
+} else {
+  renderHome();
+}
 </script>
 </body>
 </html>
