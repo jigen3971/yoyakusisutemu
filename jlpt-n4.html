@@ -478,7 +478,12 @@ function confirmName(skip){
     document.getElementById('learner-name-input').style.borderColor='#ef4444';
     return;
   }
-  _doStartLesson(pendingLessonId);
+  if(pendingLessonId){
+    _doStartLesson(pendingLessonId);
+  } else {
+    showScreen('home');
+    renderHome();
+  }
 }
 
 function _doStartLesson(id){
@@ -624,7 +629,9 @@ function changeName(){
   localStorage.removeItem('learnerName');
   const el=document.getElementById('current-name-display');
   if(el)el.textContent='';
-  // 次にレッスンを押すと名前入力画面が出る（何もしなくてOK）
+  showScreen('name');
+  document.getElementById('learner-name-input').value='';
+  document.getElementById('learner-name-input').focus();
 }
 
 function nextLesson(){const n=LESSONS.find(l=>l.id===currentLessonId+1);if(n&&!n.locked)startLesson(n.id);}
