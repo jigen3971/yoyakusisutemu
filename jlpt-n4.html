@@ -142,6 +142,10 @@
     <h2>レッスン一覧</h2>
     <div id="lesson-cards"></div>
   </div>
+  <div style="text-align:center;padding:8px 16px 20px;">
+    <span id="current-name-display" style="font-size:13px;color:#64748b;"></span>
+    <button onclick="changeName()" style="margin-left:8px;font-size:12px;color:#6366f1;background:none;border:none;cursor:pointer;text-decoration:underline;">名前を変える</button>
+  </div>
 </div>
 
 <div id="name-screen" class="screen">
@@ -426,6 +430,8 @@ function getProgress(){try{return JSON.parse(localStorage.getItem('jlpt_n4_progr
 function saveProgress(id,score,total){const p=getProgress();if(!p[id]||score>(p[id].score||0)){p[id]={score,total,done:true};localStorage.setItem('jlpt_n4_progress',JSON.stringify(p))}}
 
 function renderHome(){
+  const el=document.getElementById('current-name-display');
+  if(el)el.textContent=learnerName&&learnerName!=='（なまえなし）'?'👤 '+learnerName:'';
   const progress=getProgress();
   const doneCount=Object.keys(progress).length;
   document.getElementById('stat-done').textContent=doneCount;
@@ -610,6 +616,14 @@ function showResult(){
   const nb=document.getElementById('btn-next-lesson');
   if(nextL&&!nextL.locked){nb.style.display='block';nb.textContent=`つぎの レッスン（${nextL.id}回目）へ →`;}
   else{nb.style.display='none';}
+}
+
+function changeName(){
+  learnerName='';
+  localStorage.removeItem('learnerName');
+  const el=document.getElementById('current-name-display');
+  if(el)el.textContent='';
+  // 次にレッスンを押すと名前入力画面が出る（何もしなくてOK）
 }
 
 function nextLesson(){const n=LESSONS.find(l=>l.id===currentLessonId+1);if(n&&!n.locked)startLesson(n.id);}
