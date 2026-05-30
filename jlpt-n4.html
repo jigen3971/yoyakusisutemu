@@ -458,13 +458,9 @@ function renderHome(){
 
 function startLesson(id){
   pendingLessonId=id;
-  if(learnerName){
-    _doStartLesson(id);
-  } else {
-    showScreen('name');
-    document.getElementById('learner-name-input').value='';
-    document.getElementById('learner-name-input').focus();
-  }
+  showScreen('name');
+  document.getElementById('learner-name-input').value='';
+  document.getElementById('learner-name-input').focus();
 }
 
 function confirmName(skip){
@@ -639,13 +635,7 @@ function retryLesson(){startLesson(currentLessonId);}
 function goHome(){showScreen('home');renderHome();}
 function showScreen(name){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(name+'-screen').classList.add('active');window.scrollTo(0,0);}
 
-// アプリ起動時：名前未登録なら名前入力画面を最初に表示
-if(!learnerName){
-  showScreen('name');
-  document.getElementById('learner-name-input').focus();
-} else {
-  renderHome();
-}
+renderHome();
 </script>
 </body>
 </html>
