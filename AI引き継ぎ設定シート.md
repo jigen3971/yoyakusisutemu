@@ -156,6 +156,7 @@ Google Apps Script（GAS）
 |-----|------|
 | LINE_TOKEN | LINEチャネルアクセストークン |
 | LINE_USER_ID | 通知を受け取るLINEユーザーID（Uで始まる文字列） |
+| LINE_URL | 友だち追加URL（例：https://lin.ee/OiWZie7）※未設定の場合はデフォルト値を使用 |
 
 ### GAS appsscript.json（権限設定）
 外部通信を使うため以下のスコープが必要：
@@ -172,7 +173,27 @@ Google Apps Script（GAS）
 GAS の Script Properties の値を差し替えるだけでOK：
 1. LINE_TOKEN → お客様のチャネルアクセストークン
 2. LINE_USER_ID → お客様のLINEユーザーID
-※ GASの再デプロイ・権限再設定は不要
+3. LINE_URL → お客様の公式LINE友だち追加URL（lin.ee/〜）
+※ GASの再デプロイ・コード編集は不要
+
+### LINE友だち追加ボタン（予約完了後に表示）
+- 予約送信成功後、画面下に緑の「📲 LINE友だち追加はこちら」ボタンが表示される
+- GASが返す `lineUrl` の値を使用（未取得時は LINE_URL のデフォルト値にフォールバック）
+- コードの場所：index.html の約900行目付近（fetchのレスポンス処理部分）
+
+### LINE公式アカウント ウェルカムメッセージ
+設定場所：[manager.line.biz](https://manager.line.biz) → 応答設定 → あいさつメッセージ
+
+```
+heart break 三 公式LINEへようこそ！🍛
+ご登録いただきありがとうございます。
+こちらのアカウントでは、ご予約の確認・当日のご案内・お店からのお知らせをお届けします。
+【営業時間】11:00〜18:00
+【定休日】火曜日・第2日曜日
+【場所】福島県郡山市
+ご予約はこちら👇
+https://jigen3971.xyz/reservation/
+```
 
 ---
 
@@ -190,4 +211,4 @@ Xserverにデプロイする環境が整っています。
 
 ---
 
-*最終更新：2026年5月28日（予約システム完成・LINE通知連携済み）*
+*最終更新：2026年5月30日（LINE友だち追加ボタン実装済み・ウェルカムメッセージ設定方法追記）*

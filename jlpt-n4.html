@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>JLPT N4 にほんご れんしゅう</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Hiragino Sans', 'Yu Gothic', 'Noto Sans JP', sans-serif; background: #eef2ff; min-height: 100vh; color: #1e293b; }
+    .screen { display: none; }
+    .screen.active { display: block; }
+
+    /* HOME */
+    .home-header { background: linear-gradient(135deg, #1d4ed8, #4f46e5); color: white; padding: 32px 20px 28px; text-align: center; }
+    .home-header .flag { font-size: 28px; margin-bottom: 8px; }
+    .home-header h1 { font-size: 22px; font-weight: 900; letter-spacing: 1px; }
+    .home-header p { font-size: 13px; opacity: 0.85; margin-top: 4px; }
+    .home-stats { display: flex; justify-content: center; gap: 24px; background: white; padding: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+    .stat-item { text-align: center; }
+    .stat-num { font-size: 28px; font-weight: 900; color: #1d4ed8; }
+    .stat-label { font-size: 11px; color: #64748b; margin-top: 2px; }
+    .lesson-list { padding: 16px; }
+    .lesson-list h2 { font-size: 13px; color: #64748b; margin-bottom: 12px; letter-spacing: 1px; }
+    .lesson-card { background: white; border-radius: 16px; padding: 16px 18px; margin-bottom: 12px; display: flex; align-items: center; gap: 14px; cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.06); border: 2px solid transparent; transition: all 0.15s; -webkit-tap-highlight-color: transparent; }
+    .lesson-card:active { transform: scale(0.98); }
+    .lesson-card.locked { opacity: 0.5; cursor: default; }
+    .lesson-card.completed { border-color: #16a34a; }
+    .lesson-card.available { border-color: #1d4ed8; }
+    .lesson-icon { width: 48px; height: 48px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 22px; flex-shrink: 0; }
+    .lesson-card.completed .lesson-icon { background: #dcfce7; }
+    .lesson-card.available .lesson-icon { background: #dbeafe; }
+    .lesson-card.locked .lesson-icon { background: #f1f5f9; }
+    .lesson-info { flex: 1; min-width: 0; }
+    .lesson-num { font-size: 11px; color: #64748b; font-weight: 600; }
+    .lesson-title { font-size: 14px; font-weight: 700; color: #1e293b; line-height: 1.4; margin-top: 1px; }
+    .lesson-sub { font-size: 11px; color: #94a3b8; margin-top: 2px; }
+    .lesson-badge { flex-shrink: 0; font-size: 11px; font-weight: 700; padding: 4px 10px; border-radius: 20px; }
+    .badge-done { background: #dcfce7; color: #16a34a; }
+    .badge-go { background: #dbeafe; color: #1d4ed8; }
+    .badge-lock { background: #f1f5f9; color: #94a3b8; }
+    .score-stars { font-size: 13px; margin-top: 4px; }
+
+    /* QUIZ */
+    #quiz-screen { min-height: 100vh; background: #eef2ff; }
+    .quiz-header { background: white; padding: 14px 16px 12px; display: flex; align-items: center; gap: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); position: sticky; top: 0; z-index: 10; }
+    .btn-back-quiz { width: 36px; height: 36px; border: none; background: #f1f5f9; border-radius: 10px; cursor: pointer; font-size: 18px; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+    .quiz-title { flex: 1; min-width: 0; }
+    .quiz-lesson-name { font-size: 12px; color: #64748b; }
+    .quiz-progress-text { font-size: 14px; font-weight: 700; color: #1e293b; }
+    .progress-bar-wrap { height: 6px; background: #e2e8f0; border-radius: 3px; overflow: hidden; margin: 10px 16px 0; }
+    .progress-bar-fill { height: 100%; background: linear-gradient(90deg, #1d4ed8, #4f46e5); border-radius: 3px; transition: width 0.3s ease; }
+    .quiz-body { padding: 16px; }
+    .section-label { display: inline-block; background: #1d4ed8; color: white; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 20px; margin-bottom: 8px; }
+    .section-instruction { font-size: 12px; color: #64748b; background: #f8fafc; padding: 10px 12px; border-radius: 10px; margin-bottom: 14px; line-height: 1.6; }
+    .question-card { background: white; border-radius: 16px; padding: 20px; box-shadow: 0 2px 12px rgba(0,0,0,0.07); margin-bottom: 16px; }
+    .question-text { font-size: 17px; line-height: 1.7; font-weight: 500; color: #1e293b; margin-bottom: 20px; }
+    .underline { text-decoration: underline; text-decoration-color: #1d4ed8; }
+    .choices { display: flex; flex-direction: column; gap: 10px; }
+    .choice-btn { width: 100%; padding: 14px 16px; border: 2px solid #e2e8f0; border-radius: 12px; background: white; cursor: pointer; font-size: 15px; font-family: inherit; color: #1e293b; text-align: left; display: flex; align-items: center; gap: 12px; transition: all 0.15s; -webkit-tap-highlight-color: transparent; }
+    .choice-btn:active:not(:disabled) { transform: scale(0.98); }
+    .choice-btn .num { width: 28px; height: 28px; border-radius: 50%; background: #f1f5f9; display: flex; align-items: center; justify-content: center; font-size: 13px; font-weight: 700; color: #64748b; flex-shrink: 0; }
+    .choice-btn:hover:not(:disabled) { border-color: #93c5fd; background: #eff6ff; }
+    .choice-btn.correct { border-color: #16a34a; background: #f0fdf4; }
+    .choice-btn.correct .num { background: #16a34a; color: white; }
+    .choice-btn.wrong { border-color: #dc2626; background: #fef2f2; }
+    .choice-btn.wrong .num { background: #dc2626; color: white; }
+    .choice-btn.show-correct { border-color: #16a34a; background: #f0fdf4; }
+    .choice-btn.show-correct .num { background: #16a34a; color: white; }
+    .choice-btn:disabled { cursor: default; }
+
+    /* 選択中の一時ハイライト */
+    .choice-btn.selected-answer { border-color: #6366f1; background: #eef2ff; }
+    .choice-btn.selected-answer .num { background: #6366f1; color: white; }
+
+    /* 解説レビュー（結果画面） */
+    .review-section { width: 100%; max-width: 360px; margin-top: 8px; }
+    .review-header { color: white; font-size: 16px; font-weight: 700; margin-bottom: 12px; padding: 0 4px; }
+    .review-card { background: white; border-radius: 16px; padding: 16px; margin-bottom: 14px; }
+    .review-qnum { font-size: 11px; font-weight: 700; color: #6366f1; margin-bottom: 6px; }
+    .review-qtext { font-size: 15px; font-weight: 500; color: #1e293b; line-height: 1.6; margin-bottom: 12px; }
+    .review-answers { display: flex; flex-direction: column; gap: 6px; margin-bottom: 12px; }
+    .review-ans { font-size: 13px; padding: 8px 12px; border-radius: 8px; display: flex; align-items: center; gap: 8px; }
+    .review-ans.wrong-ans { background: #fef2f2; color: #991b1b; }
+    .review-ans.correct-ans { background: #f0fdf4; color: #166534; }
+    .review-exp { background: #fffbeb; border: 1px solid #fde68a; border-radius: 10px; padding: 12px; }
+    .review-exp-title { font-size: 11px; font-weight: 700; color: #92400e; margin-bottom: 6px; }
+    .review-exp-ja { font-size: 13px; color: #1e293b; line-height: 1.7; margin-bottom: 8px; }
+    .review-exp-tl { font-size: 13px; color: #1e40af; background: #eff6ff; border-radius: 8px; padding: 8px 10px; line-height: 1.7; }
+    .review-exp-tl-label { font-size: 11px; font-weight: 700; color: #1d4ed8; margin-bottom: 3px; }
+
+    /* RESULT */
+    #result-screen { min-height: 100vh; background: linear-gradient(160deg, #1d4ed8 0%, #4f46e5 100%); padding: 40px 20px; display: flex; flex-direction: column; align-items: center; }
+    .result-emoji { font-size: 64px; margin-bottom: 16px; }
+    .result-title { font-size: 24px; font-weight: 900; color: white; margin-bottom: 4px; }
+    .result-subtitle { font-size: 14px; color: rgba(255,255,255,0.8); margin-bottom: 32px; }
+    .result-card { background: white; border-radius: 24px; padding: 28px; width: 100%; max-width: 360px; box-shadow: 0 8px 32px rgba(0,0,0,0.2); text-align: center; margin-bottom: 20px; }
+    .score-circle { width: 120px; height: 120px; border-radius: 50%; background: #f8fafc; display: flex; flex-direction: column; align-items: center; justify-content: center; margin: 0 auto 20px; border: 6px solid #1d4ed8; }
+    .score-num { font-size: 36px; font-weight: 900; color: #1d4ed8; line-height: 1; }
+    .score-total { font-size: 13px; color: #64748b; margin-top: 2px; }
+    .score-stars-big { font-size: 28px; margin-bottom: 12px; }
+    .score-msg { font-size: 16px; font-weight: 700; color: #1e293b; margin-bottom: 4px; }
+    .score-msg-sub { font-size: 13px; color: #64748b; }
+    .result-breakdown { width: 100%; max-width: 360px; background: rgba(255,255,255,0.15); border-radius: 16px; padding: 16px; margin-bottom: 24px; }
+    .breakdown-row { display: flex; justify-content: space-between; align-items: center; padding: 6px 0; border-bottom: 1px solid rgba(255,255,255,0.15); color: white; font-size: 13px; }
+    .breakdown-row:last-child { border-bottom: none; }
+    .breakdown-ok { color: #86efac; font-weight: 700; }
+    .breakdown-ng { color: #fca5a5; font-weight: 700; }
+    .result-btns { display: flex; flex-direction: column; gap: 12px; width: 100%; max-width: 360px; }
+    .btn-retry, .btn-home, .btn-next-lesson { padding: 16px; border-radius: 14px; font-size: 15px; font-weight: 700; font-family: inherit; cursor: pointer; border: none; -webkit-tap-highlight-color: transparent; }
+    .btn-next-lesson { background: white; color: #1d4ed8; }
+    .btn-retry { background: rgba(255,255,255,0.2); color: white; border: 2px solid rgba(255,255,255,0.4); }
+    .btn-home { background: rgba(255,255,255,0.1); color: rgba(255,255,255,0.8); }
+    /* NAME INPUT SCREEN */
+    #name-screen { display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; padding: 32px 20px; background: linear-gradient(135deg, #1d4ed8, #4f46e5); }
+    .name-card { background: white; border-radius: 24px; padding: 32px 24px; width: 100%; max-width: 360px; text-align: center; box-shadow: 0 8px 32px rgba(0,0,0,0.2); }
+    .name-icon { font-size: 48px; margin-bottom: 16px; }
+    .name-title { font-size: 20px; font-weight: 900; color: #1e293b; margin-bottom: 6px; }
+    .name-sub { font-size: 13px; color: #64748b; margin-bottom: 24px; line-height: 1.6; }
+    .name-input { width: 100%; padding: 14px 16px; border: 2px solid #e2e8f0; border-radius: 12px; font-size: 16px; font-family: inherit; outline: none; transition: border-color 0.2s; margin-bottom: 8px; }
+    .name-input:focus { border-color: #4f46e5; }
+    .name-input-label { font-size: 11px; color: #64748b; text-align: left; margin-bottom: 16px; display: block; }
+    .btn-name-start { width: 100%; padding: 16px; background: linear-gradient(135deg, #1d4ed8, #4f46e5); color: white; border: none; border-radius: 14px; font-size: 16px; font-weight: 700; font-family: inherit; cursor: pointer; margin-top: 8px; }
+    .btn-name-skip { width: 100%; padding: 12px; background: none; color: #94a3b8; border: none; font-size: 13px; font-family: inherit; cursor: pointer; margin-top: 4px; }
+    .save-status { font-size: 12px; color: #22c55e; margin-top: 8px; min-height: 18px; }
+  </style>
+</head>
+<body>
+
+<div id="home-screen" class="screen active">
+  <div class="home-header">
+    <div class="flag">🇯🇵 🇵🇭</div>
+    <h1>JLPT N4 れんしゅう</h1>
+    <p>技人国ビザ取得者向け 日本語学習アプリ</p>
+  </div>
+  <div class="home-stats">
+    <div class="stat-item"><div class="stat-num" id="stat-done">0</div><div class="stat-label">かんりょう</div></div>
+    <div class="stat-item"><div class="stat-num">8</div><div class="stat-label">ぜんぶ</div></div>
+    <div class="stat-item"><div class="stat-num" id="stat-avg">-</div><div class="stat-label">へいきんスコア</div></div>
+  </div>
+  <div class="lesson-list">
+    <h2>レッスン一覧</h2>
+    <div id="lesson-cards"></div>
+  </div>
+</div>
+
+<div id="name-screen" class="screen">
+  <div class="name-card">
+    <div class="name-icon">✏️</div>
+    <div class="name-title">なまえを おしえてください</div>
+    <div class="name-sub">Pakisulat ang iyong pangalan.<br>スコアを記録するために使います。</div>
+    <input type="text" class="name-input" id="learner-name-input" placeholder="例）Maria / 山田 太郎" maxlength="30">
+    <span class="name-input-label">※ ニックネームでも OK です</span>
+    <button class="btn-name-start" onclick="confirmName()">スタート！ 🚀</button>
+    <button class="btn-name-skip" onclick="confirmName(true)">スキップして はじめる</button>
+  </div>
+</div>
+
+<div id="quiz-screen" class="screen">
+  <div class="quiz-header">
+    <button class="btn-back-quiz" onclick="goHome()">←</button>
+    <div class="quiz-title">
+      <div class="quiz-lesson-name" id="quiz-lesson-name"></div>
+      <div class="quiz-progress-text" id="quiz-progress-text"></div>
+    </div>
+  </div>
+  <div class="progress-bar-wrap"><div class="progress-bar-fill" id="progress-bar-fill" style="width:0%"></div></div>
+  <div class="quiz-body" id="quiz-body"></div>
+</div>
+
+<div id="result-screen" class="screen">
+  <div class="result-emoji" id="result-emoji">🎉</div>
+  <div class="result-title" id="result-title">おつかれさまでした！</div>
+  <div class="result-subtitle" id="result-subtitle"></div>
+  <div class="result-card">
+    <div class="score-circle"><div class="score-num" id="result-score-num">0</div><div class="score-total" id="result-score-total">/ 0</div></div>
+    <div class="score-stars-big" id="result-stars"></div>
+    <div class="score-msg" id="result-msg"></div>
+    <div class="score-msg-sub" id="result-msg-sub"></div>
+  </div>
+  <div class="result-breakdown" id="result-breakdown"></div>
+  <div class="save-status" id="save-status"></div>
+  <div class="result-btns">
+    <button class="btn-next-lesson" id="btn-next-lesson" onclick="nextLesson()">つぎの レッスンへ →</button>
+    <button class="btn-retry" onclick="retryLesson()">もう いちど やる 🔄</button>
+    <button class="btn-home" onclick="goHome()">ホームに もどる 🏠</button>
+  </div>
+  <div class="review-section" id="review-section"></div>
+</div>
+
+<script>
+const PROXY_URL = './proxy.php';
+let learnerName = localStorage.getItem('learnerName') || '';
+let pendingLessonId = null;
+
+const LESSONS = [
+  {
+    id:1, title:"私・家族・私の国の紹介", subtitle:"Introducing yourself, family and country", icon:"👋",
+    questions:[
+      {section:"問題１",instruction:"（　）に なにを いれますか。いちばん いい ものを ひとつ えらんで ください。",
+       q:"わたしは 日本の えいがに （　） が あります。",c:["きょうみ","しょうせつ","せいさん","ちから"],a:0,
+       exp:{ja:"「きょうみ（興味）」は「関心・好きな気持ち」という意味です。「〜に興味がある」は「〜が好きで、もっと知りたい」という表現です。②しょうせつ＝小説（novel）、③せいさん＝生産（production）、④ちから＝力（power）は文に合いません。",
+            tl:"Ang 'kyoumi (興味)' ay nangangahulugang interes. 'Eiga ni kyoumi ga aru' = interesado sa pelikula. Ang ibang mga salita ay hindi angkop sa pangungusap."}},
+      {section:"問題１",instruction:"（　）に なにを いれますか。いちばん いい ものを ひとつ えらんで ください。",
+       q:"わたしの （　） は しょうせつを 読む ことです。",c:["せいかつ","しつもん","しゅみ","やすみ"],a:2,
+       exp:{ja:"「しゅみ（趣味）」は「好きでよくすること・hobby」という意味です。「趣味は〜することです」は自己紹介でよく使う表現です。①せいかつ＝生活（daily life）、②しつもん＝質問（question）、④やすみ＝休み（rest/day off）は合いません。",
+            tl:"Ang 'shumi (趣味)' ay nangangahulugang libangan o hobby. 'Shumi wa ~ koto desu' = Ang aking hobby ay ~. Ito ang karaniwang parirala sa pagpapakilala ng sarili."}},
+      {section:"問題１",instruction:"（　）に なにを いれますか。いちばん いい ものを ひとつ えらんで ください。",
+       q:"わたしは ちかくの 店で （　） を して います。",c:["アルバイト","エレベーター","コーヒー","レストラン"],a:0,
+       exp:{ja:"「アルバイト」は「パートタイムの仕事」のことです。ドイツ語の『Arbeit』が語源です。「店でアルバイトをする」は「お店でパートタイム仕事をする」という意味です。",
+            tl:"Ang 'arubaito' ay part-time na trabaho. Galing ito sa salitang Aleman na 'Arbeit'. 'Mise de arubaito wo suru' = nagtatrabaho part-time sa tindahan."}},
+      {section:"問題１",instruction:"（　）に なにを いれますか。いちばん いい ものを ひとつ えらんで ください。",
+       q:"わたしの 国は 日本と （　） を して います。",c:["かいもの","ぼうえき","ゆにゅう","りょこう"],a:1,
+       exp:{ja:"「ぼうえき（貿易）」は「国と国の間でものを売ったり買ったりすること・trade」です。「国と国が貿易する」という表現が自然です。③ゆにゅう＝輸入（import）は貿易の一部ですが、「〜とゆにゅうをする」とは言いません。",
+            tl:"Ang 'boueki (貿易)' ay internasyonal na kalakalan sa pagitan ng mga bansa (trade). 'Nihon to boueki wo suru' = nakikipagkalakalan sa Japan. Hindi 'kaimono' (pamimili) o 'ryokou' (turismo)."}},
+      {section:"問題２",instruction:"＿＿の ぶんと だいたい おなじ いみの ぶんが あります。いちばん いい ものを ひとつ えらんで ください。",
+       q:"おとうとは <u>のりものが すきです</u>。",c:["おとうとは テニスや サッカーが すきです。","おとうとは バスや 電車が すきです。","おとうとは パンや ごはんが すきです。","おとうとは 本や ざっしが すきです。"],a:1,
+       exp:{ja:"「のりもの（乗り物）」は「バス・電車・飛行機など、人が乗って移動するもの・vehicle」のことです。②「バスや電車」はどちらも乗り物なので、正解です。①はスポーツ、③は食べ物、④は本・雑誌です。",
+            tl:"Ang 'norimono (乗り物)' ay sasakyan tulad ng bus, tren, eroplano atbp. Ang ②'basu ya densha' (bus at tren) ay parehong sasakyan, kaya ito ang tamang sagot."}},
+      {section:"問題２",instruction:"＿＿の ぶんと だいたい おなじ いみの ぶんが あります。いちばん いい ものを ひとつ えらんで ください。",
+       q:"<u>あなたの ゆめは 何ですか</u>。",c:["あなたが いつか やりたい ことは 何ですか。","あなたが 今 こまって いる ことは 何ですか。","あなたが たいせつに して いる ものは 何ですか。","あなたが ひまな とき よく する ことは 何ですか。"],a:0,
+       exp:{ja:"「ゆめ（夢）」は「将来実現したいこと・dream/goal」という意味です。「いつかやりたいこと＝将来の夢」なので、①が正解です。②は悩み、③は大切なもの、④は趣味の質問です。",
+            tl:"Ang 'yume (夢)' ay pangarap para sa hinaharap. 'Itsu ka yaritai koto' (bagay na nais gawin someday) = kahulugang katulad ng pangarap. Kaya ang ① ang tamang sagot."}},
+      {section:"問題３",instruction:"つぎの ことばの つかいかたで いちばん いい ものを ひとつ えらんで ください。",
+       q:"「しょうらい」",c:["この ページの かんじの テストは しょうらい あります。","日本語の しゅくだいは しょうらい します。","むすめは しょうらい 学校から かえって きます。","わたしは しょうらい 学校の 先生に なりたいです。"],a:3,
+       exp:{ja:"「しょうらい（将来）」は「これからの未来・将来のこと・future」という意味です。夢や目標を話すときに使います。④「将来、先生になりたい」が最も自然な使い方です。①②③は近い未来（今日・明日など）の話で、「将来」は使いません。",
+            tl:"Ang 'shourai (将来)' ay nangangahulugang malayong hinaharap o kinabukasan. Ginagamit ito para sa mga pangarap o layunin. Ang ④'shourai, sensei ni naritai' = nais maging guro sa hinaharap, ang pinakanatural na gamit."}},
+      {section:"問題３",instruction:"つぎの ことばの つかいかたで いちばん いい ものを ひとつ えらんで ください。",
+       q:"「うまい」",c:["あには 足が うまいので、5キロを 16分で はしります。","あねは えが うまいので、えを かく しごとを して います。","父は しごとが うまいので、はやく うちに かえって きます。","母は 電話が うまいので、毎日 友だちと 話して います。"],a:1,
+       exp:{ja:"「うまい」は「じょうず・上手・skilled/good at」という意味です。「絵がうまい」＝「絵を描くのが上手」→絵の仕事をしているという流れが自然です。①「足がうまい」は不自然（速いは「足が速い」）。③④も「仕事がうまい」「電話がうまい」は不自然な表現です。",
+            tl:"Ang 'umai' ay nangangahulugang mahusay o magaling sa isang bagay. 'E ga umai' = magaling sa pagguhit. Kaya nagtatrabaho siya sa pagguhit. Hindi natural ang 'ashi ga umai' - dapat 'ashi ga hayai' (mabilis tumakbo)."}},
+      {section:"問題４",instruction:"ひらがなで どう かきますか。ひとつ えらんで ください。",
+       q:"おとうとは からだが <u>強い</u>です。",c:["あつい","たかい","つよい","よわい"],a:2,
+       exp:{ja:"「強い（つよい）」の読み方です。「体が強い」は「健康で丈夫なこと・strong/healthy」という意味です。①あつい＝暑い/厚い、②たかい＝高い、④よわい＝弱い（反対語）です。",
+            tl:"Ang kanji na '強' ay binabasa bilang 'tsuyoi' na nangangahulugang malakas. 'Karada ga tsuyoi' = malusog at malakas ang katawan. Ang ④'yowai' ay kabaligtaran - nangangahulugang mahina."}},
+      {section:"問題４",instruction:"ひらがなで どう かきますか。ひとつ えらんで ください。",
+       q:"わたしには <u>兄</u>が 一人 います。",c:["あに","あね","いもうと","おとうと"],a:0,
+       exp:{ja:"「兄（あに）」は「自分より年上の男のきょうだい・older brother」のことです。「お兄さん（おにいさん）」は他の人の兄を呼ぶときに使います。②あね＝姉（older sister）、③いもうと＝妹（younger sister）、④おとうと＝弟（younger brother）です。",
+            tl:"Ang '兄' ay binabasa bilang 'ani' na nangangahulugang kuya (older brother). '姉 (ane)' = ate, '妹 (imouto)' = bunso/nakababatang babae, '弟 (otouto)' = nakababatang lalaki."}},
+      {section:"問題５",instruction:"どう かきますか。ひとつ えらんで ください。",
+       q:"わたしの 父は <u>いしゃ</u>です。",c:["医者","医社","医車","医写"],a:0,
+       exp:{ja:"「医者（いしゃ）」は「お医者さん・ドクター・doctor」のことです。「医（い）」は「医学・医療」、「者（しゃ）」は「人・person」を意味します。「医社・医車・医写」という言葉は存在しません。",
+            tl:"Ang tamang kanji ay '医者 (isha)' na nangangahulugang doktor. '医 (i)' = medikal, '者 (sha)' = tao/person. Ang '医社', '医車', '医写' ay hindi umiiral sa Japanese."}},
+      {section:"問題５",instruction:"どう かきますか。ひとつ えらんで ください。",
+       q:"わたしの <u>いもうと</u>は 大学生です。",c:["好","妹","姉","嫁"],a:1,
+       exp:{ja:"「妹（いもうと）」は「自分より年下の女のきょうだい・younger sister」のことです。③姉（あね）は年上の女のきょうだい。①好（す/こう）はlike/love、④嫁（よめ）はbride/daughter-in-lawです。",
+            tl:"Ang '妹 (imouto)' ay nangangahulugang nakababatang kapatid na babae (younger sister). Huwag malito sa '姉 (ane)' = nakatatandang kapatid na babae. Ang '好' = gusto, '嫁' = nobya/manugang."}},
+    ]
+  },
+  {
+    id:2, title:"休みの日・人の印象", subtitle:"Days off & impressions of people", icon:"🌸",
+    questions:[
+      {section:"問題１",instruction:"（　）に なにを いれますか。いちばん いい ものを ひとつ えらんで ください。",
+       q:"キムさんは 先生の 話を （　） 聞いて います。",c:["しんせつに","だんだん","まじめに","ゆうめいに"],a:2,
+       exp:{ja:"「まじめ（真面目）」は「ふざけないで、しっかりやること・seriously/diligently」という意味です。「まじめに聞く」は「真剣に聞く・listen carefully」です。①しんせつ＝親切（kind）、②だんだん＝gradually、④ゆうめいに＝有名に（famously）は文に合いません。",
+            tl:"Ang 'majime (真面目)' ay nangangahulugang seryoso at tapat. 'Majime ni kiku' = pakikinig nang seryoso. Hindi angkop ang 'shinsetsu ni' (mabait), 'dandan' (unti-unti), o 'yuumei ni' (sikat)."}},
+      {section:"問題１",instruction:"（　）に なにを いれますか。いちばん いい ものを ひとつ えらんで ください。",
+       q:"きのう、かみを きりに （　） へ 行きました。",c:["かいしゃ","きっさてん","たいしかん","びよういん"],a:3,
+       exp:{ja:"「美容院（びよういん）」は「かみを切ったり、スタイルを整えたりする場所・hair salon」です。注意：「病院（びょういん）・hospital」と似ていますが、読み方が違います。①かいしゃ＝会社、②きっさてん＝喫茶店、③たいしかん＝大使館です。",
+            tl:"Ang 'biyouin (美容院)' ay salon ng buhok. Mag-ingat sa pagkalito sa 'byouin (病院)' = ospital - magkaiba ang pronunciation! 'B-I-yo-u-in' vs 'B-yo-u-in'."}},
+      {section:"問題１",instruction:"（　）に なにを いれますか。いちばん いい ものを ひとつ えらんで ください。",
+       q:"なかがわさんは （　） 人です。",c:["おいしい","おとなしい","さむい","たかい"],a:1,
+       exp:{ja:"「おとなしい」は「静かで、あまりしゃべらない性格・quiet/gentle」という意味で、人の性格を表します。①おいしい＝食べ物の味（delicious）、③さむい＝温度（cold）、④たかい＝値段や高さ（expensive/tall）は人の性格には使いません。",
+            tl:"Ang 'otonashii' ay nangangahulugang tahimik at mahinahon ang ugali. Ito ay para sa ugali ng tao. 'Oishii' = masarap (pagkain), 'samui' = malamig (temperatura), 'takai' = mahal/matangkad - hindi para sa ugali."}},
+      {section:"問題１",instruction:"（　）に なにを いれますか。いちばん いい ものを ひとつ えらんで ください。",
+       q:"こんや おもしろい テレビ （　） の ほうそうが ありますよ。",c:["りょうり","ばんぐみ","ばんごう","りょこう"],a:1,
+       exp:{ja:"「番組（ばんぐみ）」は「テレビやラジオの番組・TV/radio program」のことです。「テレビ番組の放送がある」が自然な表現です。③「番号（ばんごう）」は数字の番号（number）で全然違います。",
+            tl:"Ang 'bangumi (番組)' ay programa sa TV o radyo. 'Terebi bangumi no housou ga aru' = may mapanonood na programa sa TV. Huwag malito sa 'bangou (番号)' = numero/bilang - iba ang kahulugan!"}},
+      {section:"問題２",instruction:"＿＿の ぶんと だいたい おなじ いみの ぶんが あります。いちばん いい ものを ひとつ えらんで ください。",
+       q:"休みの 日は <u>たいてい どこかへ 出かけます</u>。",c:["休みの 日は あまり どこかへ 出かけません。","休みの 日は だいたい どこかへ 出かけます。","休みの 日は ちょっと どこかへ 出かけます。","休みの 日は ときどき どこかへ 出かけます。"],a:1,
+       exp:{ja:"「たいてい」と「だいたい」はどちらも「ほとんどの場合・usually/mostly」という意味で、ほぼ同じです。①「あまり〜ません」はnot very often（否定）、③「ちょっと」はa little、④「ときどき」はsometimesで意味が違います。",
+            tl:"Ang 'taitei' at 'daitai' ay parehong nangangahulugang 'kadalasan' o 'usually'. Kaya ang ②'daitai' ang pinakamalapit. Ang ①'amari ~masen' = hindi madalas (negatibo), ④'tokidoki' = paminsan-minsan."}},
+      {section:"問題２",instruction:"＿＿の ぶんと だいたい おなじ いみの ぶんが あります。いちばん いい ものを ひとつ えらんで ください。",
+       q:"きむらさんは <u>うつくしい</u> 人です。",c:["きむらさんは しずかな 人です。","きむらさんは きれいな 人です。","きむらさんは ゆうめいな 人です。","きむらさんは まじめな 人です。"],a:1,
+       exp:{ja:"「うつくしい（美しい）」と「きれい（綺麗）」はどちらも「beautiful・美しい」という意味で使えます。「きれい」には「beautiful」と「clean（きれい）」の2つの意味があります。①しずか＝quiet、③ゆうめい＝famous、④まじめ＝seriousです。",
+            tl:"Ang 'utsukushii' at 'kirei' ay parehong nangangahulugang maganda (beautiful). Ang 'kirei' ay maaari ring mangahulugang malinis (clean). Ang ①'shizuka' = tahimik, ③'yuumei' = sikat, ④'majime' = seryoso."}},
+      {section:"問題３",instruction:"つぎの ことばの つかいかたで いちばん いい ものを ひとつ えらんで ください。",
+       q:"「しっかり」",c:["あの えいがは しっかりして おもしろかったです。","あの 子は まだ 小さいですが しっかりして いますね。","あの びよういんは しっかりして ゆうめいです。","その パンは しっかりして おいしくなかったです。"],a:1,
+       exp:{ja:"「しっかり（している）」は「責任感があって頼りになる・reliable/mature」という意味です。②「まだ小さいのにしっかりしている」→小さい子なのに大人っぽくて頼りになる、という文が最も自然です。映画・美容院・パンには「しっかり」は使いません。",
+            tl:"Ang 'shikkari (shite iru)' ay nangangahulugang matatag, responsable, at mapagkatiwalaan. Natural ang ②'mada chiisai ga shikkari shite iru' = maliit pa ngunit matibay ang loob. Hindi ito ginagamit para sa pelikula, salon, o tinapay."}},
+      {section:"問題３",instruction:"つぎの ことばの つかいかたで いちばん いい ものを ひとつ えらんで ください。",
+       q:"「きびしい」",c:["キムさんは きびしい 学生で 毎日 よく べんきょうして います。","もりさんの きびしい ふくを 見て おどろきました。","やまもと先生の うちで きびしい りょうりを ごちそうに なりました。","やまもと先生は 学生に とても きびしい 先生です。"],a:3,
+       exp:{ja:"「きびしい（厳しい）」は「ルールや基準が高く、ゆるくない・strict/severe」という意味です。「先生が学生に厳しい」という使い方が最も自然です。①「きびしい学生」②「きびしい服」③「きびしい料理」は日本語として不自然です。",
+            tl:"Ang 'kibishii (厳しい)' ay nangangahulugang mahigpit o striktong. 'Sensei ga gakusei ni kibishii' = mahigpit na guro. Hindi natural ang 'kibishii gakusei' (①), 'kibishii fuku' (②), o 'kibishii ryouri' (③)."}},
+      {section:"問題４",instruction:"ひらがなで どう かきますか。ひとつ えらんで ください。",
+       q:"きのうの <u>夜</u>は、一人で ゲームを して いました。",c:["あさ","ひる","ばん","よる"],a:3,
+       exp:{ja:"「夜（よる）」は「夜・night」の読み方です。「夕方から朝まで」を「よる（夜）」といいます。①あさ＝朝（morning）、②ひる＝昼（daytime）、③ばん＝晩（evening）も夜の意味ですが、「夜（よる）」の読み方を聞いています。",
+            tl:"Ang '夜' ay binabasa bilang 'yoru' na nangangahulugang gabi (night). '朝 (asa)' = umaga, '昼 (hiru)' = tanghali/hapon, '晩 (ban)' = takipsilim/gabi (mas pormal). Ang tamang pagbasa ng '夜' ay 'yoru'."}},
+      {section:"問題４",instruction:"ひらがなで どう かきますか。ひとつ えらんで ください。",
+       q:"<u>日曜日</u>は、友だちと うみに 行きました。",c:["にちよび","にちよんび","にちよっび","にちようび"],a:3,
+       exp:{ja:"「日曜日（にちようび）」の正しい読み方です。「日＝にち」「曜＝よう」「日＝び」と読みます。「にちよび」「にちよんび」「にちよっび」はすべて間違いです。曜日：月（げつ）火（か）水（すい）木（もく）金（きん）土（ど）日（にち）",
+            tl:"Ang tamang pagbasa ng '日曜日' ay 'nichiyoubi' (Linggo). '日=nichi', '曜=you', '日=bi'. Lahat ng ibang pagbasa ay mali. Mga araw ng linggo: 月(Lunes), 火(Martes), 水(Miyerkules), 木(Huwebes), 金(Biyernes), 土(Sabado), 日(Linggo)."}},
+      {section:"問題５",instruction:"どう かきますか。ひとつ えらんで ください。",
+       q:"母は <u>きびしい</u> 人です。",c:["楽しい","厳しい","新しい","大人しい"],a:1,
+       exp:{ja:"「きびしい」の漢字は「厳しい（きびしい）」です。①楽しい（たのしい）＝fun/enjoyable、③新しい（あたらしい）＝new、④大人しい（おとなしい）＝quiet/gentle。それぞれ読み方と意味が全く違います。",
+            tl:"Ang tamang kanji ng 'kibishii' ay '厳しい' (mahigpit). '楽しい (tanoshii)' = masaya, '新しい (atarashii)' = bago, '大人しい (otonashii)' = tahimik. Bawat isa ay may iba't ibang kahulugan at pagbasa."}},
+      {section:"問題５",instruction:"どう かきますか。ひとつ えらんで ください。",
+       q:"やまもと先生は <u>しんせつ</u>です。",c:["新切","人切","大切","親切"],a:3,
+       exp:{ja:"「親切（しんせつ）」は「他の人に優しくして助けること・kind/helpful」という意味です。「親」はおや/したしい（close/friendly）、「切」はせつ（earnest）。「新切・人切」という漢字の言葉は存在しません。「大切（たいせつ）」は「important」で別の単語です。",
+            tl:"Ang tamang kanji ng 'shinsetsu' ay '親切' na nangangahulugang mabait at matulungin (kind). '親 = malapit/pamilya', '切 = tapat'. Ang '新切' at '人切' ay hindi umiiral. Ang '大切 (taisetsu)' = mahalaga, ibang salita."}},
+    ]
+  },
+  {
+    id:3, title:"最近のことについて話す", subtitle:"Talking about recent events", icon:"📰",
+    questions:[
+      {section:"問題１",instruction:"（　）に なにを いれますか。いちばん いい ものを ひとつ えらんで ください。",
+       q:"友だちに 会えなくて、（　） です。",c:["うつくしい","きびしい","さびしい","すずしい"],a:2,
+       exp:{ja:"「さびしい（寂しい）」は「一人で、誰かに会いたい気持ち・lonely」という意味です。友達に会えない→さびしい、という流れが自然です。①うつくしい＝beautiful、②きびしい＝strict、④すずしい＝cool/refreshing（温度）は合いません。",
+            tl:"Ang 'sabishii (寂しい)' ay nangangahulugang malungkot dahil nawawalan o hindi nakikita ang mahal sa buhay/kaibigan (lonely). Natural na maramdamang 'sabishii' kapag hindi nakikita ang kaibigan."}},
+      {section:"問題１",instruction:"（　）に なにを いれますか。いちばん いい ものを ひとつ えらんで ください。",
+       q:"おかげさまで、新しい しごとに （　） きました。",c:["あって","ついて","なれて","はいって"],a:2,
+       exp:{ja:"「なれる（慣れる）」は「最初は難しかったことが、だんだん自然にできるようになること・to get used to」です。「仕事に慣れてきた」は「仕事が最初は大変だったが、だんだん慣れてきた」という意味です。「おかげさまで」は感謝の表現です。",
+            tl:"Ang 'nareru (慣れる)' ay nangangahulugang masanay. 'Shigoto ni narete kita' = unti-unti na nasasanay sa trabaho. 'Okagesama de' = salamat sa tulong ng lahat (magalang na pagpapasalamat)."}},
+      {section:"問題１",instruction:"（　）に なにを いれますか。いちばん いい ものを ひとつ えらんで ください。",
+       q:"となりの かぞくが 大きな こえで （　） して います。",c:["けっこん","けんか","ぼうえき","ゆにゅう"],a:1,
+       exp:{ja:"「けんか（喧嘩）」は「怒って、大きな声で言い合いをすること・to fight/quarrel」です。「大きな声で〜している」→けんかの状況が最も自然です。①けっこん＝結婚（marriage）、③ぼうえき＝貿易（trade）、④ゆにゅう＝輸入（import）は合いません。",
+            tl:"Ang 'kenka (喧嘩)' ay nangangahulugang away o pagtatalo. Natural na maingay kapag nag-aaway ang pamilya. 'Kekkon (結婚)' = kasal, 'boueki' = kalakalan, 'yunyuu' = pag-import - hindi angkop."}},
+      {section:"問題１",instruction:"（　）に なにを いれますか。いちばん いい ものを ひとつ えらんで ください。",
+       q:"わたしは まいあさ 6時に おきる （　） が あります。",c:["きょうみ","しゅうかん","しょうかい","るす"],a:1,
+       exp:{ja:"「しゅうかん（習慣）」は「毎日くり返してやること・habit/routine」という意味です。「毎朝6時に起きる習慣がある」は「every morning as a habit」という意味です。①きょうみ＝興味（interest）、③しょうかい＝紹介（introduction）、④るす＝留守（not home）は合いません。",
+            tl:"Ang 'shuukan (習慣)' ay nangangahulugang gawi o habit. 'Maiaasa 6-ji ni okiru shuukan ga aru' = ugaling gumising ng 6 am araw-araw. 'Kyoumi' = interes, 'shoukai' = pagpapakilala, 'rusu' = wala sa bahay."}},
+      {section:"問題２",instruction:"＿＿の ぶんと だいたい おなじ いみの ぶんが あります。いちばん いい ものを ひとつ えらんで ください。",
+       q:"てがみを 読んで、<u>びっくりしました</u>。",c:["てがみを 読んで、おどろきました。","てがみを 読んで、こまりました。","てがみを 読んで、さびしく なりました。","てがみを 読んで、しんぱいしました。"],a:0,
+       exp:{ja:"「びっくりする」と「おどろく（驚く）」はどちらも「surprised・驚く」という同じ意味です。どちらも「予想しなかったことが起きたとき」に使います。②こまる＝困る（troubled）、③さびしい＝寂しい（lonely）、④しんぱい＝心配（worried）は違います。",
+            tl:"Ang 'bikkuri suru' at 'odoroku (驚く)' ay parehong nangangahulugang magulat (surprised). Pareho silang ginagamit kapag may hindi inaasahang nangyari. 'Komaru' = nag-aalala/nahihirapan, 'sabishii' = malungkot."}},
+      {section:"問題２",instruction:"＿＿の ぶんと だいたい おなじ いみの ぶんが あります。いちばん いい ものを ひとつ えらんで ください。",
+       q:"となりの いえの おじいさんが <u>なくなりました</u>。",c:["となりの いえの おじいさんが 言いました。","となりの いえの おじいさんが 聞きました。","となりの いえの おじいさんが しにました。","となりの いえの おじいさんが 出かけました。"],a:2,
+       exp:{ja:"「なくなる（亡くなる）」は「死ぬ（しぬ）」の丁寧な・敬語的な表現です。「亡くなりました」は「死にました」より丁寧で、お葬式やお悔やみの場面でよく使われます。日本語では「死ぬ」より「亡くなる」のほうが礼儀正しい表現です。",
+            tl:"Ang 'nakunaru (亡くなる)' ay magalang na paraan ng pagsasabi ng 'shinu (死ぬ)' = mamatay. Ang 'nakunarimashita' ay mas magalang at ginagamit sa libing o pagpapahayag ng pakikiramay. Mas magalang kaysa 'shinimashita'."}},
+      {section:"問題３",instruction:"つぎの ことばの つかいかたで いちばん いい ものを ひとつ えらんで ください。",
+       q:"「るす」",c:["雨と かぜが つよくて、学校が るすに なりました。","ゆうびんきょくが るすだったので、きっては 買えませんでした。","先生の いえを たずねましたが、るすでした。","新しい びじゅつかんに 行きましたが、るすでした。"],a:2,
+       exp:{ja:"「るす（留守）」は「家の人がいない・not home/nobody home」という意味です。③「先生の家を訪ねたが、留守だった」＝「先生が家にいなかった」が正しい使い方です。学校・郵便局・美術館は「留守」になりません（人がいる場所には使わない）。",
+            tl:"Ang 'rusu (留守)' ay nangangahulugang wala sa bahay (nobody home). '先生の家を訪ねたが、留守でした' = Pumunta sa bahay ng guro ngunit wala siya. Hindi ito ginagamit para sa paaralan, post office, o museum."}},
+      {section:"問題３",instruction:"つぎの ことばの つかいかたで いちばん いい ものを ひとつ えらんで ください。",
+       q:"「さいきん」",c:["さいきん じゅぎょうが はじまるので、きょうしつへ 行きましょう。","さいきん いっしょに えいがを 見に 行きませんか。","さいきん かえって きたので、まだ 何も 食べて いません。","さいきん 子どもが まじめに べんきょうしないので、しんぱいです。"],a:3,
+       exp:{ja:"「さいきん（最近）」は「この頃・lately/recently」という意味で、最近の変化や状況を表します。④「最近、子供が真剣に勉強しない」→最近の子供の変化・状況を表す文が最も自然です。①②は未来・提案の文で「最近」は使いません。",
+            tl:"Ang 'saikin (最近)' ay nangangahulugang kamakailan o lately/recently. Pinaka-natural ang ④'saikin kodomo ga majime ni benkyou shinai' = kamakailan, hindi sineseryoso ng bata ang pag-aaral. Nagpapakita ng bagong pagbabago."}},
+      {section:"問題４",instruction:"ひらがなで どう かきますか。ひとつ えらんで ください。",
+       q:"友だちが <u>有名な</u> テレビばんぐみに 出ました。",c:["ゆうめ","ゆうめい","ゆめ","ゆめい"],a:1,
+       exp:{ja:"「有名（ゆうめい）」の正しい読み方です。「有（ゆう）」＋「名（めい）」＝「ゆうめい」。「ゆうめ」「ゆめ」「ゆめい」はすべて間違いです。「夢（ゆめ）」は全く別の漢字・別の単語です。",
+            tl:"Ang tamang pagbasa ng '有名' ay 'yuumei' na nangangahulugang sikat o bantog (famous). '有 = yuu', '名 = mei'. Lahat ng ibang pagbasa ay mali. Huwag malito sa '夢 (yume)' = pangarap - ibang kanji ito!"}},
+      {section:"問題４",instruction:"ひらがなで どう かきますか。ひとつ えらんで ください。",
+       q:"あには <u>去年</u> けっこんしました。",c:["きょうねん","きょねん","きゅうねん","きゅねん"],a:1,
+       exp:{ja:"「去年（きょねん）」の正しい読み方です。「去（きょ）」＋「年（ねん）」＝「きょねん」。「きょうねん」は間違いです（「去」は「きょ」であり「きょう」ではありません）。今年＝ことし、来年＝らいねん、去年＝きょねん。",
+            tl:"Ang tamang pagbasa ng '去年' ay 'kyonen' na nangangahulugang nakaraang taon (last year). '去 = kyo (HINDI kyou)', '年 = nen'. 'Kyounen' ay MALI. Taon: 今年 (kotoshi) = ngayong taon, 来年 (rainen) = susunod na taon, 去年 (kyonen) = nakaraang taon."}},
+      {section:"問題５",instruction:"どう かきますか。ひとつ えらんで ください。",
+       q:"そぼは まいあさ こうえんを 1時間 <u>あるいて</u> います。",c:["足いて","歩いて","走いて","元いて"],a:1,
+       exp:{ja:"「歩く（あるく）」のて形は「歩いて（あるいて）」です。漢字は「歩（ほ/あるく）」です。「足いて・走いて・元いて」という表現は存在しません。「走る（はしる）→走って」「泳ぐ（およぐ）→泳いで」と区別しましょう。",
+            tl:"Ang te-form ng 'aruku (歩く)' = maglakad ay 'aruite (歩いて)'. Ang tamang kanji ay '歩'. Ang '足いて', '走いて', '元いて' ay hindi umiiral. 'Hashiru (走る)' = tumakbo → 'hashitte'."}},
+      {section:"問題５",instruction:"どう かきますか。ひとつ えらんで ください。",
+       q:"うちの <u>ちかくに</u> 新しい スーパーが できました。",c:["辺く","近く","返く","遠く"],a:1,
+       exp:{ja:"「近く（ちかく）」の漢字は「近」です。「近い（ちかい）」の名詞形です。反対語は「遠く（とおく）・far away」。「辺く・返く」という漢字の言葉は存在しません。",
+            tl:"Ang tamang kanji ng 'chikaku' ay '近く' na nangangahulugang malapit. '遠く (tooku)' = malayo (kabaligtaran). Ang '辺く' at '返く' ay hindi umiiral sa Japanese."}},
+      {section:"問題５",instruction:"どう かきますか。ひとつ えらんで ください。",
+       q:"あねは このごろ げんきが ないので、<u>しんぱい</u>です。",c:["心配","化配","父配","必配"],a:0,
+       exp:{ja:"「心配（しんぱい）」は「心が落ち着かない・worried/anxious」という意味です。「心（こころ）」は心・heart、「配（はい）」は配る・arrange。「化配・父配・必配」という漢字の組み合わせは存在しません。",
+            tl:"Ang tamang kanji ng 'shinpai' ay '心配' na nangangahulugang nag-aalala (worried). '心 = puso/kalooban', '配 = ipamahagi'. Ang '化配', '父配', '必配' ay hindi umiiral bilang salita sa Japanese."}},
+    ]
+  },
+  {
+    id:4, title:"プレゼントをあげましょう", subtitle:"Giving gifts", icon:"🎁",
+    questions:[
+      {section:"問題１",instruction:"（　）に なにを いれますか。いちばん いい ものを ひとつ えらんで ください。",
+       q:"みんなで （　） して、先生に 花を プレゼントしました。",c:["しょうたい","そうだん","ぼうえき","りょうり"],a:1,
+       exp:{ja:"「そうだん（相談）」は「みんなで話し合って決めること・to discuss/consult」です。「みんなで相談して〜した」は「together we discussed and decided to ~」という意味です。①しょうたい＝招待（invite）、③ぼうえき＝貿易、④りょうり＝料理（cooking）は合いません。",
+            tl:"Ang 'soudan (相談)' ay nangangahulugang pag-usapan o kumonsulta. 'Minna de soudan shite' = pinag-usapan ng lahat at nagpasya. 'Shoutai' = mag-imbita, 'boueki' = kalakalan, 'ryouri' = pagluluto."}},
+      {section:"問題１",instruction:"（　）に なにを いれますか。いちばん いい ものを ひとつ えらんで ください。",
+       q:"友だちの けっこんの （　） に 何を あげますか。",c:["アイディア","おいわい","おれい","たんじょうび"],a:1,
+       exp:{ja:"「おいわい（お祝い）」は「おめでたいことをお祝いする贈り物・celebration/congratulatory gift」という意味です。「けっこんのお祝い」は「wedding celebration gift」です。③おれい＝お礼（thank-you gift）は結婚祝いとは違います。",
+            tl:"Ang 'oiwai (お祝い)' ay regalo o pagbati para sa espesyal na okasyon. 'Kekkon no oiwai' = regalo para sa kasal (wedding gift). 'Orei (お礼)' = pasasalamat, 'tanjoubi (誕生日)' = kaarawan - iba ang okasyon."}},
+      {section:"問題１",instruction:"（　）に なにを いれますか。いちばん いい ものを ひとつ えらんで ください。",
+       q:"けっこんしきに だれを （　） しますか。",c:["しょうかい","しょうたい","せいさん","そうだん"],a:1,
+       exp:{ja:"「しょうたい（招待）」は「パーティーや行事に来てほしい人を誘うこと・to invite」という意味です。「結婚式に〜を招待する」が自然です。①しょうかい＝紹介（introduce）と混同しやすいので注意！「紹介」は人を会わせること、「招待」は来てもらうことです。",
+            tl:"Ang 'shoutai (招待)' ay nangangahulugang mag-imbita. 'Kekkonsiki ni shoutai suru' = imbitahan sa kasal. Mag-ingat sa pagkalito sa '紹介 (shoukai)' = pagpapakilala ng tao sa isa't isa - iba ang kahulugan!"}},
+      {section:"問題１",instruction:"（　）に なにを いれますか。いちばん いい ものを ひとつ えらんで ください。",
+       q:"子どもは すきな おかしを もらって、（　） いました。",c:["さしあげて","たのんで","つくって","よろこんで"],a:3,
+       exp:{ja:"「よろこぶ（喜ぶ）」は「嬉しくて、幸せな様子・to be happy/joyful」という意味です。好きなお菓子をもらった→喜んでいた、という流れが自然です。①さしあげて＝あげる（丁寧語）、②たのんで＝頼んで（request）、③つくって＝作って（make）は合いません。",
+            tl:"Ang 'yorokobu (喜ぶ)' ay nangangahulugang masaya o natutuwa. Natural na matuwa ang bata kapag nakatanggap ng paboritong kendi. 'Sashiagete' = ibigay (magalang), 'tanonde' = humiling, 'tsukutte' = gumawa - hindi angkop."}},
+      {section:"問題２",instruction:"＿＿の ぶんと だいたい おなじ いみの ぶんが あります。いちばん いい ものを ひとつ えらんで ください。",
+       q:"<u>おれいを 言いました</u>。",c:["「ありがとう」と 言いました。","「おめでとう」と 言いました。","「ごめんなさい」と 言いました。","「さようなら」と 言いました。"],a:0,
+       exp:{ja:"「おれい（お礼）を言う」は「ありがとうと言う・to say thank you」という意味です。①「ありがとう」が正解です。②「おめでとう」＝congratulations、③「ごめんなさい」＝apology、④「さようなら」＝goodbye で全て違います。",
+            tl:"Ang 'orei wo iu (お礼を言う)' ay sabihing salamat (to say thank you). 'Arigatou to iimashita' = sinabi ng salamat - ito ang tamang sagot. 'Omedetou' = congratulations, 'gomen nasai' = patawad, 'sayounara' = paalam."}},
+      {section:"問題２",instruction:"＿＿の ぶんと だいたい おなじ いみの ぶんが あります。いちばん いい ものを ひとつ えらんで ください。",
+       q:"父が しょうせつを <u>くれました</u>。",c:["父に しょうせつを あげました。","父に しょうせつを かしました。","父に しょうせつを かりました。","父に しょうせつを もらいました。"],a:3,
+       exp:{ja:"「くれる」は「他の人→私へのプレゼント（give to me）」、「もらう」は「私が受け取ること（I receive）」です。どちらも「父→私」という方向で同じ意味になります。「あげる」は「私→他の人（I give）」で逆方向です。",
+            tl:"Ang 'kureru' (ibinibigay sa akin) at 'morau' (tinatanggap ko) ay parehong nagpapakita ng direksyon na TATAY → AKO. 'Chichi ga hon wo kureta' = 'Chichi ni hon wo moratta' = Nakatanggap ng libro mula sa tatay. 'Ageru' = AKO ang nagbibigay sa iba."}},
+      {section:"問題３",instruction:"つぎの ことばの つかいかたで いちばん いい ものを ひとつ えらんで ください。",
+       q:"「足りる」",c:["一週間前に 出した てがみが まだ 足りて いません。","おくりものを 買いに 行きましたが、お金が 足りませんでした。","はしりましたが、パーティーが はじまる 時間に 足りませんでした。","店は かいものを する 人が 足りて いて、入れませんでした。"],a:1,
+       exp:{ja:"「足りる（たりる）」は「必要な量がある・enough/sufficient」という意味です。②「お金が足りない」は「お金が少なくて足りない・not enough money」で最も自然な使い方です。①「手紙が足りていない」③「時間に足りない」は日本語として不自然です。",
+            tl:"Ang 'tariru (足りる)' ay nangangahulugang sapat o enough. 'Okane ga tarimasen deshita' = hindi sapat ang pera. Ito ang pinakanatural na gamit. Ang ①③ ay hindi natural na Japanese. Ang ④ ay kabaligtaran ng tamang kahulugan."}},
+      {section:"問題３",instruction:"つぎの ことばの つかいかたで いちばん いい ものを ひとつ えらんで ください。",
+       q:"「いただく」",c:["あにが わたしに 新しい かばんを いただきました。","先生に すてきな ハンカチを いただきました。","先生の たんじょうびに みんなで てがみを いただきました。","友だちが いえを 買ったので、おいわいに 花を いただきました。"],a:1,
+       exp:{ja:"「いただく（頂く）」は「もらう」の丁寧語で、目上の人（先生・上司）からもらうときに使います。②「先生にハンカチをいただいた」が正しい使い方です。①兄から（目上ではない場合は不自然）、③先生にあげるのに「いただく」は逆、④友人にお祝いを「いただく」は方向が逆です。",
+            tl:"Ang 'itadaku (頂く)' ay magalang na paraan ng 'morau' (tumanggap). Ginagamit ito kapag tumatanggap mula sa taong mas mataas ang katayuan tulad ng guro o boss. 'Sensei ni itadaita' = nakatanggap mula sa guro (tamang direksyon at paggamit)."}},
+      {section:"問題４",instruction:"ひらがなで どう かきますか。ひとつ えらんで ください。",
+       q:"むすこの すきな <u>物</u>を プレゼントします。",c:["くるま","はな","ほん","もの"],a:3,
+       exp:{ja:"「物（もの）」は「thing・物・もの」という読み方です。「物（もの）」はbroadな「もの」を意味します。①くるま＝車（car）、②はな＝花（flower）、③ほん＝本（book）とは違います。「物」は広い意味の「もの」です。",
+            tl:"Ang '物' ay binabasa bilang 'mono' na nangangahulugang bagay o object (thing). Hindi ito 'kuruma (車)' = kotse, 'hana (花)' = bulaklak, o 'hon (本)' = libro. '物 (mono)' ay pangkaraniwang salita para sa anumang bagay."}},
+      {section:"問題４",instruction:"ひらがなで どう かきますか。ひとつ えらんで ください。",
+       q:"あには <u>黒</u>が すきです。",c:["あお","あか","くろ","しろ"],a:2,
+       exp:{ja:"「黒（くろ）」は黒色・blackの読み方です。色の基本：青（あお）＝blue、赤（あか）＝red、白（しろ）＝white、黒（くろ）＝black、黄（き）＝yellow、緑（みどり）＝green。色の漢字と読み方を覚えましょう！",
+            tl:"Ang '黒' ay binabasa bilang 'kuro' na nangangahulugang itim (black). Mga kulay: 青(ao)=asul, 赤(aka)=pula, 白(shiro)=puti, 黒(kuro)=itim, 黄(ki)=dilaw, 緑(midori)=berde. Importante na memorahin ang mga ito!"}},
+      {section:"問題５",instruction:"どう かきますか。ひとつ えらんで ください。",
+       q:"あねに もらった セーターを <u>きて</u> います。",c:["青て","差て","書て","着て"],a:3,
+       exp:{ja:"「着る（きる）」のて形は「着て（きて）」です。「着（ちゃく/きる）」は「服を着る・to wear/put on」という意味です。「着る」は上に着るもの（シャツ・コート・セーターなど）に使います。「はく（履く）」はズボン・靴などです。",
+            tl:"Ang te-form ng 'kiru (着る)' = magsuot ay 'kite (着て)'. Ang '着' ay nangangahulugang magsuot ng damit. 'Kiru' ay ginagamit para sa damit sa itaas (shirt, jacket, sweater). 'Haku (履く)' ay para sa pantalon at sapatos."}},
+      {section:"問題５",instruction:"どう かきますか。ひとつ えらんで ください。",
+       q:"りょうりを つくって、みんなが 来るのを <u>まちました</u>。",c:["待ちました","持ちました","討ちました","特ちました"],a:0,
+       exp:{ja:"「待つ（まつ）」の漢字は「待（ま）つ」です。「待ちました（まちました）」は「waited」という意味です。「持つ（もつ）」は「hold/carry（持つ）」で違う意味です。読み方も意味も違うので注意しましょう。",
+            tl:"Ang tamang kanji ng 'machimashita' ay '待ちました' mula sa 'matsu (待つ)' = maghintay (to wait). '持つ (motsu)' = hawakan o dalhin (to hold/carry) - ibang kahulugan! Ang '討つ' at '特' ay ganap na iba."}},
+      {section:"問題５",instruction:"どう かきますか。ひとつ えらんで ください。",
+       q:"新しい <u>ふく</u>が 買いたいです。",c:["彼","役","服","股"],a:2,
+       exp:{ja:"「服（ふく）」は「衣服・clothes/clothing」という意味です。「新しい服を買いたい」が自然な文です。①彼（かれ）＝he/him、②役（やく）＝role/use、④股（また）＝crotch/thigh で全く意味が違います。",
+            tl:"Ang tamang kanji ng 'fuku' ay '服' na nangangahulugang damit (clothes). 'Atarashii fuku ga kaitai' = gusto kong bumili ng bagong damit. '彼 (kare)' = siya (lalaki), '役 (yaku)' = papel/gamit, '股 (mata)' = pantay ng hita - ganap na ibang kahulugan."}},
+    ]
+  },
+  {id:5,title:"準備中",subtitle:"Coming soon",icon:"🔒",locked:true},
+  {id:6,title:"準備中",subtitle:"Coming soon",icon:"🔒",locked:true},
+  {id:7,title:"準備中",subtitle:"Coming soon",icon:"🔒",locked:true},
+  {id:8,title:"準備中",subtitle:"Coming soon",icon:"🔒",locked:true},
+];
+
+let currentLessonId=null, currentQuestionIdx=0, answers=[], answered=false;
+
+function getProgress(){try{return JSON.parse(localStorage.getItem('jlpt_n4_progress')||'{}')}catch{return{}}}
+function saveProgress(id,score,total){const p=getProgress();if(!p[id]||score>(p[id].score||0)){p[id]={score,total,done:true};localStorage.setItem('jlpt_n4_progress',JSON.stringify(p))}}
+
+function renderHome(){
+  const progress=getProgress();
+  const doneCount=Object.keys(progress).length;
+  document.getElementById('stat-done').textContent=doneCount;
+  const scores=Object.values(progress).map(p=>Math.round(p.score/p.total*100));
+  document.getElementById('stat-avg').textContent=scores.length?Math.round(scores.reduce((a,b)=>a+b,0)/scores.length)+'%':'-';
+  const container=document.getElementById('lesson-cards');
+  container.innerHTML='';
+  LESSONS.forEach(lesson=>{
+    const p=progress[lesson.id];
+    const isLocked=lesson.locked&&!p;
+    const isDone=!!p;
+    const pct=p?Math.round(p.score/p.total*100):null;
+    const stars=pct!==null?(pct>=90?'⭐⭐⭐':pct>=70?'⭐⭐':'⭐'):'';
+    const cls=isDone?'completed':(isLocked?'locked':'available');
+    const badge=isDone?`<span class="lesson-badge badge-done">✓ ${pct}%</span>`:(isLocked?'<span class="lesson-badge badge-lock">🔒</span>':'<span class="lesson-badge badge-go">スタート</span>');
+    const card=document.createElement('div');
+    card.className='lesson-card '+cls;
+    card.innerHTML=`<div class="lesson-icon">${lesson.icon}</div><div class="lesson-info"><div class="lesson-num">${lesson.id}回目</div><div class="lesson-title">${lesson.title}</div><div class="lesson-sub">${lesson.subtitle}</div>${stars?`<div class="score-stars">${stars}</div>`:''}</div>${badge}`;
+    if(!isLocked&&!lesson.locked)card.onclick=()=>startLesson(lesson.id);
+    container.appendChild(card);
+  });
+}
+
+function startLesson(id){
+  pendingLessonId=id;
+  if(learnerName){
+    _doStartLesson(id);
+  } else {
+    showScreen('name');
+    document.getElementById('learner-name-input').value='';
+    document.getElementById('learner-name-input').focus();
+  }
+}
+
+function confirmName(skip){
+  const input=document.getElementById('learner-name-input').value.trim();
+  if(!skip&&input){
+    learnerName=input;
+    localStorage.setItem('learnerName',learnerName);
+  } else if(skip){
+    learnerName='（なまえなし）';
+  } else {
+    document.getElementById('learner-name-input').style.borderColor='#ef4444';
+    return;
+  }
+  _doStartLesson(pendingLessonId);
+}
+
+function _doStartLesson(id){
+  currentLessonId=id;currentQuestionIdx=0;answers=[];answered=false;showScreen('quiz');renderQuestion();
+}
+
+function renderQuestion(){
+  const lesson=LESSONS.find(l=>l.id===currentLessonId);
+  const total=lesson.questions.length;
+  const idx=currentQuestionIdx;
+  const q=lesson.questions[idx];
+  document.getElementById('quiz-lesson-name').textContent=`${lesson.id}回目 ${lesson.title}`;
+  document.getElementById('quiz-progress-text').textContent=`${idx+1} / ${total}`;
+  document.getElementById('progress-bar-fill').style.width=((idx/total)*100)+'%';
+  const prevSection=idx>0?lesson.questions[idx-1].section:null;
+  const showSection=q.section!==prevSection;
+  let html='';
+  if(showSection){html+=`<div class="section-label">${q.section}</div><div class="section-instruction">${q.instruction}</div>`;}
+  const qHtml=q.q.replace(/<u>(.*?)<\/u>/g,'<span class="underline">$1</span>');
+  html+=`<div class="question-card"><div class="question-text">${qHtml}</div><div class="choices" id="choices">`;
+  q.c.forEach((c,i)=>{html+=`<button class="choice-btn" id="choice-${i}" onclick="selectAnswer(${i})"><span class="num">${i+1}</span><span>${c}</span></button>`;});
+  html+=`</div></div>`;
+  document.getElementById('quiz-body').innerHTML=html;
+  answered=false;
+}
+
+function selectAnswer(chosen){
+  if(answered)return;
+  answered=true;
+  const lesson=LESSONS.find(l=>l.id===currentLessonId);
+  const q=lesson.questions[currentQuestionIdx];
+  const correct=chosen===q.a;
+  answers.push({correct,chosen,answer:q.a,question:q});
+  document.querySelectorAll('.choice-btn').forEach(btn=>btn.disabled=true);
+  document.getElementById('choice-'+chosen).classList.add('selected-answer');
+  setTimeout(()=>nextQuestion(),600);
+}
+
+function nextQuestion(){
+  const lesson=LESSONS.find(l=>l.id===currentLessonId);
+  currentQuestionIdx++;
+  if(currentQuestionIdx>=lesson.questions.length){showResult();}
+  else{renderQuestion();window.scrollTo(0,0);}
+}
+
+function showResult(){
+  const lesson=LESSONS.find(l=>l.id===currentLessonId);
+  const total=answers.length;
+  const score=answers.filter(a=>a.correct).length;
+  const pct=Math.round(score/total*100);
+  saveProgress(currentLessonId,score,total);
+  showScreen('result');
+  document.getElementById('result-emoji').textContent=pct>=90?'🏆':pct>=70?'🎉':'💪';
+  document.getElementById('result-title').textContent=pct>=90?'すごい！パーフェクト！':pct>=70?'よく できました！':'がんばりましょう！';
+  document.getElementById('result-subtitle').textContent=lesson.title;
+  document.getElementById('result-score-num').textContent=score;
+  document.getElementById('result-score-total').textContent='/ '+total;
+  document.getElementById('result-stars').textContent=pct>=90?'⭐⭐⭐':pct>=70?'⭐⭐':'⭐';
+  document.getElementById('result-msg').textContent=`${pct}%　せいかい`;
+  document.getElementById('result-msg-sub').textContent=`${score}もん せいかい / ${total}もん`;
+  const sections={};
+  lesson.questions.forEach((q,i)=>{
+    if(!sections[q.section])sections[q.section]={ok:0,ng:0};
+    answers[i].correct?sections[q.section].ok++:sections[q.section].ng++;
+  });
+  let bHtml='';
+  Object.entries(sections).forEach(([sec,data])=>{bHtml+=`<div class="breakdown-row"><span>${sec}</span><span><span class="breakdown-ok">✓ ${data.ok}</span>　<span class="breakdown-ng">✗ ${data.ng}</span></span></div>`;});
+  document.getElementById('result-breakdown').innerHTML=bHtml;
+  // 正解・不正解のレビューセクションを表示
+  const correctAnswers=answers.filter(a=>a.correct);
+  const wrongAnswers=answers.filter(a=>!a.correct);
+  let rHtml='';
+  // ✅ 正解した問題
+  if(correctAnswers.length>0){
+    rHtml+='<div class="review-header" style="color:#22c55e">✅ せいかい / Mga Tamang Sagot</div>';
+    correctAnswers.forEach(a=>{
+      const q=a.question;
+      const qText=q.q.replace(/<u>(.*?)<\/u>/g,'<span class="underline">$1</span>');
+      const qNum=answers.indexOf(a)+1;
+      rHtml+=`<div class="review-card" style="border-left:4px solid #22c55e">
+        <div class="review-qnum" style="color:#15803d">${q.section} · もんだい ${qNum}</div>
+        <div class="review-qtext">${qText}</div>
+        <div class="review-answers">
+          <div class="review-ans correct-ans">✅ せいかい：${q.c[a.answer]}</div>
+        </div>
+      </div>`;
+    });
+  }
+  // ❌ 間違えた問題（解説つき）
+  if(wrongAnswers.length>0){
+    rHtml+='<div class="review-header" style="margin-top:16px">❌ まちがえた もんだい / Mga Maling Sagot</div>';
+    wrongAnswers.forEach(a=>{
+      const q=a.question;
+      const qText=q.q.replace(/<u>(.*?)<\/u>/g,'<span class="underline">$1</span>');
+      const qNum=answers.indexOf(a)+1;
+      rHtml+=`<div class="review-card" style="border-left:4px solid #ef4444">
+        <div class="review-qnum">${q.section} · もんだい ${qNum}</div>
+        <div class="review-qtext">${qText}</div>
+        <div class="review-answers">
+          <div class="review-ans wrong-ans">❌ あなたの こたえ：${q.c[a.chosen]}</div>
+          <div class="review-ans correct-ans">✅ せいかい：${q.c[a.answer]}</div>
+        </div>
+        ${q.exp?`<div class="review-exp">
+          <div class="review-exp-title" style="font-size:11px;font-weight:700;color:#92400e;margin-bottom:6px">📖 かいせつ / PALIWANAG</div>
+          <div class="review-exp-ja">${q.exp.ja}</div>
+          <div class="review-exp-tl"><div style="font-size:11px;font-weight:700;color:#1d4ed8;margin-bottom:3px">🇵🇭 Tagalog</div>${q.exp.tl}</div>
+        </div>`:''}
+      </div>`;
+    });
+  } else {
+    rHtml+='<div class="review-header" style="color:#22c55e;margin-top:16px">🎉 ぜんもん せいかい！ Lahat tama!</div>';
+  }
+  document.getElementById('review-section').innerHTML=rHtml;
+
+  // スプレッドシートに結果を送信
+  const wrongNums=wrongAnswers.map(a=>answers.indexOf(a)+1).join(',');
+  const params=new URLSearchParams({
+    action:'quiz',
+    learnerName:learnerName||'（なまえなし）',
+    lessonId:currentLessonId,
+    lessonTitle:lesson.title,
+    score,
+    total,
+    pct,
+    wrongNums:wrongNums||'なし'
+  });
+  fetch(PROXY_URL+'?'+params.toString())
+    .then(r=>r.json())
+    .then(()=>{
+      const el=document.getElementById('save-status');
+      if(el)el.textContent='✅ きろく ほぞん ずみ / Naitala na!';
+    })
+    .catch(()=>{});
+
+  const nextL=LESSONS.find(l=>l.id===currentLessonId+1);
+  const nb=document.getElementById('btn-next-lesson');
+  if(nextL&&!nextL.locked){nb.style.display='block';nb.textContent=`つぎの レッスン（${nextL.id}回目）へ →`;}
+  else{nb.style.display='none';}
+}
+
+function nextLesson(){const n=LESSONS.find(l=>l.id===currentLessonId+1);if(n&&!n.locked)startLesson(n.id);}
+function retryLesson(){startLesson(currentLessonId);}
+function goHome(){showScreen('home');renderHome();}
+function showScreen(name){document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));document.getElementById(name+'-screen').classList.add('active');window.scrollTo(0,0);}
+
+renderHome();
+</script>
+</body>
+</html>
