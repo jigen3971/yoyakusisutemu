@@ -2,7 +2,7 @@
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
 
-$gas_url = 'https://script.google.com/macros/s/AKfycbxJba3FS89xSH_GPCN2fcU4reSYrD6slHI7zEKsUt-qMHvO4osE3--mGyfu89q5oCso/exec';
+$gas_url = 'https://script.google.com/macros/s/AKfycby6QK8SBTzYbyoFDQ5NFFP3G9OR4k-xcHHScaj46AdNaYYDxRIJGk-imYbH-GNvFT5iVw/exec';
 
 $query = http_build_query($_GET);
 $full_url = $gas_url . '?' . $query;

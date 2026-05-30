@@ -1,5 +1,7 @@
 const SHEET_ID = "1iupd_GGxDm3WaP1vF0ovhxX1mYrtiKgy8Izaa8vMRo4";
 const SHEET_NAME = "予約一覧";
+const QUIZ_SHEET_ID = "1zKMq7dB4r-N3cqknWil-GC8m1k7miQs2mDBoSknAzEI";
+const QUIZ_SHEET_NAME = "学習記録";
 
 function sendLineMessage(message) {
   try {
@@ -80,10 +82,10 @@ function doGet(e) {
 
   if (action === "quiz") {
     try {
-      const ss = SpreadsheetApp.openById(SHEET_ID);
-      let sheet = ss.getSheetByName("学習記録");
+      const ss = SpreadsheetApp.openById(QUIZ_SHEET_ID);
+      let sheet = ss.getSheetByName(QUIZ_SHEET_NAME);
       if (!sheet) {
-        sheet = ss.insertSheet("学習記録");
+        sheet = ss.insertSheet(QUIZ_SHEET_NAME);
         sheet.appendRow(["受験日時","名前","レッスン番号","レッスン名","スコア","合計問題数","正答率","間違えた問題番号"]);
       }
       const learnerName = e.parameter.learnerName || "（名前なし）";
