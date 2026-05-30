@@ -375,7 +375,7 @@ const LESSONS = [
             tl:"Ang 'oiwai (お祝い)' ay regalo o pagbati para sa espesyal na okasyon. 'Kekkon no oiwai' = regalo para sa kasal (wedding gift). 'Orei (お礼)' = pasasalamat, 'tanjoubi (誕生日)' = kaarawan - iba ang okasyon."}},
       {section:"問題１",instruction:"（　）に なにを いれますか。いちばん いい ものを ひとつ えらんで ください。",
        q:"けっこんしきに だれを （　） しますか。",c:["しょうかい","しょうたい","せいさん","そうだん"],a:1,
-       exp:{ja:"「しょうたい（招待）」は「パーティーや ぎょうじに きて ほしい ひとを さそうこと・to invite」という いみです。「けっこんしきに〜を しょうたいする」が しぜんです。①しょうかい＝紹介（しょうかい・introduce）と こんどうしやすいので ちゅうい！「しょうかい」は ひとを あわせること、「しょうたい」は きてもらうことです。",
+       exp:{ja:"「しょうたい（招待）」は「パーティーや ぎょうじに きて ほしい ひとを さそうこと・to invite」という いみです。「けっこんしきに〜を しょうたいする」が しぜんです。①しょうかい＝紹介（しょうかい・introduce）と まちがえやすいので きをつけましょう！「しょうかい」は ひとを あわせること、「しょうたい」は きてもらうことです。",
             tl:"Ang 'shoutai (招待)' ay nangangahulugang mag-imbita. 'Kekkonsiki ni shoutai suru' = imbitahan sa kasal. Mag-ingat sa pagkalito sa '紹介 (shoukai)' = pagpapakilala ng tao sa isa't isa - iba ang kahulugan!"}},
       {section:"問題１",instruction:"（　）に なにを いれますか。いちばん いい ものを ひとつ えらんで ください。",
        q:"子どもは すきな おかしを もらって、（　） いました。",c:["さしあげて","たのんで","つくって","よろこんで"],a:3,
@@ -427,8 +427,9 @@ const LESSONS = [
 
 let currentLessonId=null, currentQuestionIdx=0, answers=[], answered=false;
 
-function getProgress(){try{return JSON.parse(localStorage.getItem('jlpt_n4_progress')||'{}')}catch{return{}}}
-function saveProgress(id,score,total){const p=getProgress();if(!p[id]||score>(p[id].score||0)){p[id]={score,total,done:true};localStorage.setItem('jlpt_n4_progress',JSON.stringify(p))}}
+function progressKey(){return 'jlpt_n4_progress_'+(learnerName||'default');}
+function getProgress(){try{return JSON.parse(localStorage.getItem(progressKey())||'{}')}catch{return{}}}
+function saveProgress(id,score,total){const p=getProgress();if(!p[id]||score>(p[id].score||0)){p[id]={score,total,done:true};localStorage.setItem(progressKey(),JSON.stringify(p))}}
 
 function renderHome(){
   const el=document.getElementById('current-name-display');
